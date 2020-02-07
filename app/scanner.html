@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Scanner</title>
+    <link rel="stylesheet" type="text/css" href="css/layout.css">
+    <link rel="stylesheet" type="text/css" href="css/auth-layout.css">
+    <link rel="stylesheet" type="text/css" href="css/scanner-layout.css">
+    <link rel="stylesheet" type="text/css" href="css/color-scheme.css">
+    <script src="js/log.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/scanner.js"></script>
+  </head>
+  <body>
+    <h1 id="titleHeading" class="redacted">Scanner</h1>
+
+    <section id="authorizationSection" class="panel">
+      <h1 id="authorizationHeading" class="panelTitle">Authorization</h1>
+      <label id="clientIDLabel" for="clientIDInput">Client ID</label>
+      <input id="clientIDInput" class="redacted" type="text" />
+      <label id="redirectURILabel" for="redirectURIInput">Redirect URI</label>
+      <input id="redirectURIInput" type="text" />
+      <label id="authCodeLabel" for="authCodeInput">Auth Code</label>
+      <input id="authCodeInput" type="text" />
+      <button id="getAuthCodeButton" name="getAuthCode">Get Auth Code</button>
+      <button id="getTokenButton" name="getToken">Get Token</button>
+      <button id="refreshTokenButton" name="refreshToken">Refresh Token</button>
+    </section>
+
+    <section id="listSection" class="panel">
+      <h1 id="listHeading" class="panelTitle">Watchlist</h1>
+
+      <div id="listHeaderDiv" class="panelGrid">
+        <label id="stratLabel" class="redacted2 header">Strategy</label>
+        <label id="strikeLabel" class="redacted2 text header">Strike</label>
+        <label id="widthLabel" class="redacted2 numeric header">Width</label>
+        <label id="liqLabel" class="redacted2 text header">Liquidity</label>
+        <label id="pctDistLabel" class="redacted2 numeric header">% Distance</label>
+        <label id="zDistLabel" class="redacted2 numeric header">Z Distance</label>
+        <label id="probItmLabel" class="redacted2 numeric header">Prob ITM</label>
+        <label id="expValLabel" class="redacted2 numeric header">Exp Value</label>
+        <label id="profitLabel" class="redacted2 numeric header">Max Profit</label>
+        <label id="lossLabel" class="redacted2 numeric header">Max Loss</label>
+      </div>
+    </section>
+  </body>
+</html>
+
+<!--
+liquidity
+ - bid/ask spread (as percentage of mid)
+ - open int
+ - volm
+ - number of strikes
+expectation (defined risk)
+ - credit - delta * strike width
+distance
+ - number of sd's from last or z score (sd = iv * sqrt(dte/365) * last)
+
+prob itm call = 1 - f(z)
+prob itm put = f(z)
+-->

@@ -1,0 +1,90 @@
+body {
+  font-size: 9pt;
+  margin: 0 auto;
+  max-width: 80em;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#titleHeading {
+  text-align: center;
+}
+
+.panel {
+  font-size: 1em;
+  display: grid;
+  margin-bottom: 1.5em;
+  border: 1px solid;
+  padding: 0 .5em .5em .5em;
+  grid-gap: .5em;
+}
+
+.panelTitle {
+  font-size: 1em;
+  margin: 0 -.5em;
+  padding: .2em .5em;
+  border-bottom: 1px solid;
+}
+
+.panel label {
+  align-self: center;
+  font-weight: bold;
+}
+
+.panel input {
+  border: 1px solid;
+}
+
+.panelGrid {
+  display: grid;
+  margin-left: -.5em;
+  margin-right: -.5em;
+  grid-gap: 0;
+}
+
+.panelGrid > label,
+.panelGrid > div {
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
+#listSection {
+  grid-row-gap: 0;
+  padding-bottom: 0;
+}
+
+#listHeaderDiv {
+  /*margin-top: .5em;*/
+  /*border-top: 1px solid;*/
+  /*border-bottom: 1px solid;*/
+}
+
+#listHeaderDiv > label:first-child {
+  grid-column: 1 / span 2;
+  border: none;
+}
+
+#listHeaderDiv > label {
+  border-left: 1px solid;
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+
+.option {
+  border-bottom: 1px solid;
+  padding-top: .05em;
+  padding-bottom: .05em;
+}
+
+.option > .stratValue {
+  grid-column: 1 / span 2;
+}
+
+.text.header,
+.text {
+  text-align: center;
+}
+
+.numeric.header,
+.numeric {
+  text-align: right;
+}

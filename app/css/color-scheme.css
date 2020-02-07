@@ -1,0 +1,93 @@
+.xredacted {
+  background-color: #CCC !important;
+  color: #CCC !important;
+}
+
+.xredacted2 {
+  background-color: #99F !important;
+  color: #99F !important;
+}
+
+.xredacted3 {
+  background-color: #66A !important;
+  color: #66A !important;
+}
+
+body {
+  color: #333;
+  background-color: #FFC;
+}
+
+input,
+button {
+  color: #333;
+}
+
+.panel {
+  border-color: #BBB;
+  background-color: #EEE;
+}
+
+.panelTitle {
+  border-color: #BBB;
+  background-color: #66F;
+}
+
+.panel input {
+  border-color: #BBB;
+}
+
+#listHeaderDiv {
+  border-top-color: #CCC;
+  border-bottom-color: #333;
+  background-color: #99F;
+}
+
+#listHeaderDiv > label {
+  border-color: #CCC;
+}
+
+.underlying {
+  border-top-color: #777;
+  border-bottom-color: #333;
+  background-color: #66A;
+  color: #EEE;
+}
+
+.underlying > input {
+  border-color: #BBB;
+  background-color: #99F;
+  color: #EEE;
+}
+
+.option {
+  border-color: #CCC;
+}
+
+.option > .odd {
+  background-color: #EEE;
+}
+
+.option > .even {
+  background-color: #DDD;
+}
+
+.option > .itm.odd {
+  background-color: #ECC;
+}
+
+.option > .itm.even {
+  background-color: #DCC;
+}
+
+.option > .atm {
+  background-color: #CCE;
+}
+
+.option > .otm.odd {
+  background-color: #CEC;
+}
+
+.option > .otm.even {
+  background-color: #CDC;
+}

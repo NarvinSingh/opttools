@@ -1,0 +1,90 @@
+#listControlDiv {
+  grid-template-columns: repeat(9, 1fr);
+}
+
+#listControlDiv > input, select {
+  font-size: .85em;
+}
+
+#fromDateInput,
+#toDateInput {
+  /*grid-column: span 2;*/
+}
+
+#calcButton {
+  grid-column: 9;
+}
+
+#listHeaderDiv {
+  grid-template-columns: repeat(9, 1fr);
+}
+
+.underlying {
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  padding-top: .1em;
+  padding-bottom: .1em;
+  grid-template:
+    "symbolValue lastValue last targetValue target volmValue volm exp expValue"
+    / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.underlying > div {
+  font-weight: bold;
+}
+
+.underlying > .symbolValue {
+  grid-area: symbolValue;
+}
+
+.underlying > .last {
+  grid-area: last;
+}
+
+.underlying > .lastValue {
+  grid-area: lastValue;
+  text-align: right;
+}
+
+.underlying > .target {
+  grid-area: target;
+}
+
+.underlying > .targetValue {
+  grid-area: targetValue;
+  width: 100%;
+  height: .85em;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}
+
+.underlying > .volm {
+  grid-area: volm;
+}
+
+.underlying > .volmValue {
+  grid-area: volmValue;
+  text-align: right;
+}
+
+.underlying > .exp {
+  grid-area: exp;
+  text-align: right;
+}
+
+.underlying > .expValue {
+  grid-area: expValue;
+}
+
+.option {
+  grid-template-columns: repeat(9, 1fr);
+}
+
+.option > .targetValue {
+  width: 100%;
+  height: .85em;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}
