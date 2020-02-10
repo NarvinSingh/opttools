@@ -1,18 +1,5 @@
-#listControlDiv {
-  grid-template-columns: repeat(9, 1fr);
-}
-
-#listControlDiv > input, select {
-  font-size: .85em;
-}
-
-#fromDateInput,
-#toDateInput {
-  /*grid-column: span 2;*/
-}
-
-#calcButton {
-  grid-column: 9;
+#controlDiv {
+  grid-template-columns: repeat(9, auto);
 }
 
 #listHeaderDiv {
@@ -20,18 +7,20 @@
 }
 
 .underlying {
-  border-top: 1px solid;
-  border-bottom: 1px solid;
-  padding-top: .1em;
-  padding-bottom: .1em;
   grid-template:
-    "symbolValue lastValue last targetValue target volmValue volm exp expValue"
-    / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    "deleteButton symbolValue lastValue last targetValue target volmValue volm exp expValue"
+    / 1fr 4fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr;
 }
 
-.underlying > div {
-  font-weight: bold;
-}
+.underlying > button.delete {
+  margin-left: .5em;
+/*  border: none;
+  padding: 0;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url(../img/icon-delete.png);
+  background-size: contain;
+*/}
 
 .underlying > .symbolValue {
   grid-area: symbolValue;
@@ -50,10 +39,15 @@
   grid-area: target;
 }
 
-.underlying > .targetValue {
+.underlying > div.targetValue {
   grid-area: targetValue;
-  width: 100%;
-  height: .85em;
+  padding: 0;
+  text-align: right;
+}
+
+.underlying input {
+  padding: 0 .5em;
+  width: 5em;
   font-size: .9em;
   font-weight: bold;
   text-align: right;
@@ -81,9 +75,10 @@
   grid-template-columns: repeat(9, 1fr);
 }
 
-.option > .targetValue {
-  width: 100%;
-  height: .85em;
+.option input {
+  padding: 0 .5em;
+  width: 5em;
+  height: 1em;
   font-size: .9em;
   font-weight: bold;
   text-align: right;

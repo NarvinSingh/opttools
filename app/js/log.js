@@ -1,13 +1,15 @@
-var log = (function () {
+"use strict";
+
+let log = (function () {
   const SUCCESS = 0;
   const DEBUG = 1;
   const INFO = 2;
   const WARNING = 3;
   const ERROR = 6;
 
-  var msgs = [];
-  var printLevel = 0;
-  var defaultMsgLevel = SUCCESS;
+  let msgs = [];
+  let printLevel = 0;
+  let defaultMsgLevel = SUCCESS;
 
   return {
     SUCCESS: SUCCESS,
@@ -16,62 +18,66 @@ var log = (function () {
     WARNING: WARNING,
     ERROR: ERROR,
 
-    setDefaultMsgLevel: function(level) {
-      if(Number.isInteger(parseFloat(level))) {
+    setDefaultMsgLevel(level) {
+      if (Number.isInteger(parseFloat(level))) {
         defaultMsgLevel = level;
       }
     },
 
-    setPrintLevel: function(level) {
-      if(Number.isInteger(parseFloat(level))) {
+    setPrintLevel(level) {
+      if (Number.isInteger(parseFloat(level))) {
         printLevel = level;
       }
     },
 
-    enablePrinting: function() {
+    enablePrinting() {
       this.setPrintLevel(0);
     },
 
-    disablePrinting: function() {
+    disablePrinting() {
       this.setPrintLevel(-1);
     },
 
-    print: function(msg, msgLevel) {
+    print(msg, msgLevel) {
       msgLevel = msgLevel || defaultMsgLevel;
       this.addMsg(msg, msgLevel);
 
-      if(printLevel >= 0 && msgLevel >= printLevel) {
+      if (printLevel >= 0 && msgLevel >= printLevel) {
         console.log(msg);
       }
     },
 
-    addMsg: function(msg, msgLevel) {
+    addMsg(msg, msgLevel) {
       msgs.push( {msg: msg, msgLevel: msgLevel } );
     },
 
-    getMsgCount: function() {
+    getMsgCount() {
       return msgs.length;
     },
 
-    getMsg: function(index) {
-      return Number.isInteger(parseFloat(index)) && index >= 0 && index < this.getMsgCount() ? msgs[index] : null;
+    getMsg(index) {
+      return Number.isInteger(parseFloat(index))
+        && index >= 0
+        && index < this.getMsgCount() ? msgs[index] : null;
     },
 
-    getMsgText: function(index) {
-      var msg = this.getMsg(index);
+    getMsgText(index) {
+      let msg = this.getMsg(index);
+
       return msg !== null ? msg.msg : null;
     },
 
-    getMsgLevel: function(index) {
-      var msg = this.getMsg(index);
+    getMsgLevel(index) {
+      let msg = this.getMsg(index);
+
       return msg !== null ? msg.msgLevel : null;
     },
 
-    reprint: function(iFirst, count) {
-      var i;
+    reprint(iFirst, count) {
+      let i;
       
-      for(i = 0; i < count; i++) {
-        console.log(this.getMsgText(iFirst + i) + " (" + this.getMsgLevel(iFirst + i) + ")");
+      for (i = 0; i < count; i++) {
+        console.log(this.getMsgText(iFirst + i));
       }
     }
   }

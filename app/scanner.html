@@ -12,12 +12,12 @@
     <script src="js/scanner.js"></script>
   </head>
   <body>
-    <h1 id="titleHeading" class="redacted">Scanner</h1>
+    <h1 id="titleHeading">Scanner</h1>
 
     <section id="authorizationSection" class="panel">
-      <h1 id="authorizationHeading" class="panelTitle">Authorization</h1>
+      <h1 id="authorizationHeading">Authorization</h1>
       <label id="clientIDLabel" for="clientIDInput">Client ID</label>
-      <input id="clientIDInput" class="redacted" type="text" />
+      <input id="clientIDInput" type="text" />
       <label id="redirectURILabel" for="redirectURIInput">Redirect URI</label>
       <input id="redirectURIInput" type="text" />
       <label id="authCodeLabel" for="authCodeInput">Auth Code</label>
@@ -28,19 +28,23 @@
     </section>
 
     <section id="listSection" class="panel">
-      <h1 id="listHeading" class="panelTitle">Watchlist</h1>
+      <h1 id="listHeading">Watchlist</h1>
+      <div id="addSymbolDiv" class="titleControl">
+        <input id="addSymbolInput" type="text" />
+        <button id="addSymbolButton" name="addSymbol"></button>
+      </div>
 
-      <div id="listHeaderDiv" class="panelGrid">
-        <label id="stratLabel" class="redacted2 header">Strategy</label>
-        <label id="strikeLabel" class="redacted2 text header">Strike</label>
-        <label id="widthLabel" class="redacted2 numeric header">Width</label>
-        <label id="liqLabel" class="redacted2 text header">Liquidity</label>
-        <label id="pctDistLabel" class="redacted2 numeric header">% Distance</label>
-        <label id="zDistLabel" class="redacted2 numeric header">Z Distance</label>
-        <label id="probItmLabel" class="redacted2 numeric header">Prob ITM</label>
-        <label id="expValLabel" class="redacted2 numeric header">Exp Value</label>
-        <label id="profitLabel" class="redacted2 numeric header">Max Profit</label>
-        <label id="lossLabel" class="redacted2 numeric header">Max Loss</label>
+      <div id="listHeaderDiv" class="subPanel">
+        <label id="stratLabel" class="header">Strategy</label>
+        <label id="strikeLabel" class="text header">Strike</label>
+        <label id="widthLabel" class="numeric header">Width</label>
+        <label id="liqLabel" class="text header">Liquidity</label>
+        <label id="pctDistLabel" class="numeric header">% Distance</label>
+        <label id="zDistLabel" class="numeric header">Z Distance</label>
+        <label id="probItmLabel" class="numeric header">Prob ITM</label>
+        <label id="expValLabel" class="numeric header">Exp Value</label>
+        <label id="profitLabel" class="numeric header">Max Profit</label>
+        <label id="lossLabel" class="numeric header">Max Loss</label>
       </div>
     </section>
   </body>

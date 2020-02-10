@@ -1,167 +1,248 @@
-var dbgJson;
+"use strict";
+
+const calcInterval = 15000;
+const defaultStrikeCount = 13;
+
+let dbgJson;
 
 (function () {
-  var sectionList;
-  var fromDateInput;
-  var toDateInput;
-  var strikeCountSelect;
+  let listSection;
+  let addSymbolInput;
+  let fromDateInput;
+  let toDateInput;
+  let strikeCountSelect;
+  let watchlist;
+  let intervalId = null;
 
   function initCalc() {
-    var nowDate = (new Date()).toISOString().substr(0, 10);
+    const nowDate = (new Date()).toISOString().substr(0, 10);
 
-    sectionList = document.getElementById("listSection");
+    listSection = document.getElementById("listSection");
+    addSymbolInput = document.getElementById("addSymbolInput");
+    document.getElementById("addSymbolButton").addEventListener(
+      "click", processButtonAddSymbolClick);
     fromDateInput = document.getElementById("fromDateInput");
+    fromDateInput.addEventListener("input", processInputFromDateInput);
     toDateInput = document.getElementById("toDateInput");
+    toDateInput.addEventListener("input", processInputToDateInput);
     strikeCountSelect = document.getElementById("strikeCountSelect");
-    fromDateInput.value = nowDate;
-    toDateInput.value = nowDate;
-    strikeCountSelect.value = 13;
+    strikeCountSelect.addEventListener("input", processSelectStrikeCountInput);
+    fromDateInput.value = localStorage.getItem("calc-fromDate") || nowDate;
+    toDateInput.value = localStorage.getItem("calc-toDate") || fromDateInput.value;
+    strikeCountSelect.value = localStorage.getItem("calc-strikeCount") || defaultStrikeCount;
     document.getElementById("calcButton").addEventListener("click", processButtonCalcClick);
+    watchlist = localStorage.watchlist;
 
-    if(localStorage.watchlist) {      
-      localStorage.watchlist.split(",").forEach(loadSymbol);
+    if (watchlist) {      
+      watchlist = watchlist.split(",");
+      watchlist.forEach(loadSymbol);
     }
   }
 
-  function loadSymbol(symbol, index) {
-    var listRowDiv = document.createElement("div");
-    listRowDiv.id = "listRow" + index + "Div";
+  function processButtonAddSymbolClick() {
+    addSymbol(addSymbolInput.value);
+  }
+
+  function processButtonDeleteSymbolClick(event) {
+    deleteSymbol(event.currentTarget.id.split("-")[1]);
+  }
+
+  function processInputFromDateInput() {
+    localStorage.setItem("calc-fromDate", fromDateInput.value);
+  }
+
+  function processInputToDateInput() {
+    localStorage.setItem("calc-toDate", toDateInput.value);
+  }
+
+  function processSelectStrikeCountInput() {
+    localStorage.setItem("calc-strikeCount", strikeCountSelect.value);
+  }
+
+  function processButtonCalcClick(event) {
+    const elt = event.currentTarget;
+
+    if (intervalId === null) {
+      calc();
+      intervalId = setInterval(calc, calcInterval);
+      elt.className = "icon stop";
+    } else {
+      clearInterval(intervalId);
+      intervalId = null;
+      elt.className = "icon go";
+    }
+  }
+
+  function addSymbol(symbol) {
+    if (watchlist.indexOf(symbol) !== -1) {
+      log.print("addSymbol: " + symbol + " already in watchlist", log.WARNING);
+      return;
+    }
+
+    watchlist.push(symbol);
+    localStorage.setItem("watchlist", watchlist.join(","));
+    loadSymbol(symbol);
+    getOptionChain(symbol, fromDateInput.value, toDateInput.value, strikeCountSelect.value);
+    log.print("addSymbol: " + symbol + " added to watchlist");
+  }
+
+  function deleteSymbol(symbol) {
+    const symbolDiv = document.getElementById("listRow-" + symbol + "-Div");
+
+    if (symbolDiv === null) {
+      log.print("deleteSymbol: " + symbol + " not in watchlist", log.WARNING);
+      return;
+    }
+ 
+    listSection.removeChild(symbolDiv);
+    watchlist.splice(watchlist.indexOf(symbol), 1);
+    localStorage.setItem("watchlist", watchlist.join(","));
+    log.print("deleteSymbol: " + symbol + " removed from watchlist");
+  }
+
+  function calc() {
+    if (watchlist) {      
+      watchlist.forEach((symbol) => {
+        getOptionChain(symbol, fromDateInput.value, toDateInput.value, strikeCountSelect.value);
+      });
+    }
+  }
+
+  function loadSymbol(symbol) {
+    const listRowDiv = document.createElement("div");
+    listRowDiv.id = "listRow-" + symbol + "-Div";
     listRowDiv.className = "listRow";
 
-    var underlyingDiv = document.createElement("div");
-    underlyingDiv.id = "underlying" + index + "Div";
-    underlyingDiv.className = "panelGrid underlying";
+    const underlyingDiv = document.createElement("div");
+    underlyingDiv.id = "underlying-" + symbol + "-Div";
+    underlyingDiv.className = "subPanel underlying";
     listRowDiv.appendChild(underlyingDiv);
 
-    var elt = document.createElement("div");
-    elt.id = "symbol" + index + "Div";
-    elt.className = "redacted3 symbolValue";
+    let elt = document.createElement("button");
+    elt.id = "delete-" + symbol + "-Button";
+    elt.className = "icon delete";
+    elt.addEventListener("click", processButtonDeleteSymbolClick);
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement("div");
+    elt.id = "symbol-" + symbol + "-Div";
+    elt.className = "symbolValue";
     elt.innerHTML = symbol;
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("label");
-    elt.id = "last" + index + "Label";
-    elt.className = "redacted3 last";
+    elt.id = "last-" + symbol + "-Label";
+    elt.className = "last";
     elt.innerHTML = "Last";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("div");
-    elt.id = "lastValue" + index + "Div";
+    elt.id = "lastValue-" + symbol + "-Div";
     elt.className = "lastValue";
     elt.innerHTML = "NULL";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("label");
-    elt.id = "target" + index + "Label";
-    elt.className = "redacted3 target";
+    elt.id = "target-" + symbol + "-Label";
+    elt.className = "target";
     elt.innerHTML = "Target";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("input");
-    elt.id = "targetValue" + index + "Input";
+    elt.id = "targetValue-" + symbol + "-Input";
     elt.className = "targetValue";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("label");
-    elt.id = "volm" + index + "Label";
-    elt.className = "redacted3 volm";
+    elt.id = "volm-" + symbol + "-Label";
+    elt.className = "volm";
     elt.innerHTML = "Volume";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("div");
-    elt.id = "volmValue" + index + "Div";
+    elt.id = "volmValue-" + symbol + "-Div";
     elt.className = "volmValue";
     elt.innerHTML = "NULL";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("label");
-    elt.id = "exp" + index + "Label";
-    elt.className = "redacted3 exp";
+    elt.id = "exp-" + symbol + "-Label";
+    elt.className = "exp";
     elt.innerHTML = "Expiration";
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement("div");
-    elt.id = "expValue" + index + "Div";
+    elt.id = "expValue-" + symbol + "-Div";
     elt.className = "expValue";
     elt.innerHTML = "NULL";
     underlyingDiv.appendChild(elt);
 
-    sectionList.appendChild(listRowDiv);
+    listSection.appendChild(listRowDiv);
+    log.print("loadSymbol: " + symbol + " loaded");
   }
 
-  function processButtonCalcClick() {
-    if(localStorage.watchlist) {      
-      localStorage.watchlist.split(",").forEach(function(symbol, index) {
-        getOptionChain(
-          symbol,
-          fromDateInput.value,
-          toDateInput.value,
-          strikeCountSelect.value,
-          index);
-      });
-    }
-  }
-
-  function getOptionChain(symbol, fromDate, toDate, strikeCount, index) {
-    var uri = "https://api.tdameritrade.com/v1/marketdata/chains?" +
+  function getOptionChain(symbol, fromDate, toDate, strikeCount) {
+    const uri = "https://api.tdameritrade.com/v1/marketdata/chains?" +
       "symbol=" + symbol +
       "&includeQuotes=TRUE" +
       "&strikeCount=" + strikeCount +
       "&fromDate=" + fromDate +
       "&toDate=" + toDate;
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
-      processGetOptionChainResponse(xhr, index);
+      processGetOptionChainResponse(xhr, symbol, fromDate, toDate, strikeCount);
     };
     xhr.open("GET", uri);
     xhr.setRequestHeader("Authorization", "Bearer " + localStorage.accessToken);
     xhr.send();
+    log.print("getOptionChain: " + uri);
   }
 
-  function processGetOptionChainResponse(xhr, index) {
-    if(xhr.readyState == 4 && xhr.status == 200) {
-      var json = JSON.parse(xhr.responseText);
+  function processGetOptionChainResponse(xhr, symbol, fromDate, toDate, strikeCount) {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      const json = JSON.parse(xhr.responseText);
       dbgJson = json;
 
-      if(json.status == "SUCCESS") {
-        var last = (json.underlying.last != null ? json.underlying.last : json.underlyingPrice).toFixed(2).toLocaleString();
-        var volm = json.underlying.totalVolume != null ? json.underlying.totalVolume.toLocaleString() : "N/A";
-        var expKey = Object.keys(json.callExpDateMap)[0];
-        var callChain = json.callExpDateMap[expKey];
-        var putChain = json.putExpDateMap[expKey];
-        var keyParts = expKey.split(":");
-        var dtExp = new Date(keyParts[0] + " 00:00:00");
-        var dte = keyParts[1];
-        var exp = dtExp.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-        var strikes = [];
-        var shortStrike;
-        var atmStrike;
-        var fAtmStrike = 0;
-        var listRowDiv = document.getElementById("listRow" + index + "Div");
-        var optionDivId = "option" + index + "Div";
-        var optionDiv;
-        var elt;
-        var eltId;
-        var appendElts = [];
-        var ioatm;
-        var oddEven;
-        var iStrike;
+      if (json.status == "SUCCESS") {
+        const underlying = json.underlying;
+        const last = underlying !== null && underlying.last !== null ?
+          underlying.last.toFixed(2).toLocaleString() : "N/A";
+        const volm = underlying.totalVolume !== null ?
+          underlying.totalVolume.toLocaleString() : "N/A";
+        const expKey = Object.keys(json.callExpDateMap)[0];
+        const callChain = json.callExpDateMap[expKey];
+        const putChain = json.putExpDateMap[expKey];
+        const keyParts = expKey.split(":");
+        const dtExp = new Date(keyParts[0] + " 00:00:00");
+        const dte = keyParts[1];
+        const exp = dtExp.toLocaleDateString(
+          "en-US",
+          { month: "short", day: "numeric", year: "numeric" });
 
-        optionDiv = document.getElementById(optionDivId);
+        document.getElementById("lastValue-" + symbol + "-Div").innerHTML = last;
+        document.getElementById("volmValue-" + symbol + "-Div").innerHTML = volm;
+        document.getElementById("expValue-" + symbol + "-Div").innerHTML = exp + " (" + dte + ")";
 
-        if (optionDiv === null) {
-          optionDiv = document.createElement("div");
-          optionDiv.id = optionDivId;
-          optionDiv.className = "panelGrid option";
-          listRowDiv.appendChild(optionDiv);
+        const listRowDiv = document.getElementById("listRow-" + symbol + "-Div");
+        const chainDivId = "chain-" + symbol + "-Div";
+
+        let chainDiv = document.getElementById(chainDivId);
+
+        if (chainDiv === null) {
+          chainDiv = document.createElement("div");
+          chainDiv.id = chainDivId;
+          chainDiv.className = "chain";
+          listRowDiv.appendChild(chainDiv);
         }
-        
-        document.getElementById("lastValue" + index + "Div").innerHTML = last;
-        document.getElementById("volmValue" + index + "Div").innerHTML = volm;
-        document.getElementById("expValue" + index + "Div").innerHTML = exp + " (" + dte + ")";
 
-        for(shortStrike in putChain) {
-          var fShortStrike = parseFloat(shortStrike);
+        const strikes = [];
+
+        let fAtmStrike = 0;
+        let atmStrike;
+
+        Object.keys(putChain).forEach((shortStrike) => {
+          let fShortStrike = parseFloat(shortStrike);
+          let iStrike = 0;
 
           while(iStrike < strikes.length && fShortStrike < parseFloat(strikes[iStrike])) {
             iStrike++;
@@ -169,141 +250,148 @@ var dbgJson;
 
           strikes.splice(iStrike, 0, shortStrike);
 
-          if(Math.abs(fShortStrike - last) < Math.abs(fAtmStrike - last)) {
+          if (Math.abs(fShortStrike - last) < Math.abs(fAtmStrike - last)) {
             fAtmStrike = fShortStrike;
             atmStrike = shortStrike;
           }
-        }
+        });
 
-        for(iStrike = 0; iStrike < strikes.length; iStrike++) {
-          var shortStrike = strikes[iStrike];
-          var fShortStrike = parseFloat(shortStrike);
-          var shortOption = putChain[shortStrike][0];
+        log.print("ATM Strike: " + atmStrike);
 
-          ioatm = fShortStrike > fAtmStrike ? "itm" : fShortStrike < fAtmStrike ? "otm" : "atm";
-          oddEven = oddEven === "odd" ? "even" : "odd";
+        strikes.forEach((shortStrike, index) => {
+          const fShortStrike = parseFloat(shortStrike);
+          const shortOption = putChain[shortStrike][0];
+          const optionDivId = "option-" + symbol + "-" + shortStrike + "-Div";
+          const appendElts = [];
+          
+          let optionDiv = document.getElementById(optionDivId);
 
-          eltId = "stratValue-" + index + "-" + iStrike + "-Div";
-          elt = document.getElementById(eltId);
+          if (optionDiv === null) {
+            const ioatm = fShortStrike > fAtmStrike
+              ? "itm" : fShortStrike < fAtmStrike ? "otm" : "atm";
+            const oddEven = index % 2 ? "odd" : "even";
+            
+            optionDiv = document.createElement("div");
+            optionDiv.id = optionDivId;
+            optionDiv.className = "subPanel option " + ioatm + " " + oddEven;
+            chainDiv.appendChild(optionDiv);
+          }
+
+          let eltId = "stratValue-" + symbol + "-" + shortStrike + "-Div";
+          let elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "stratValue";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " stratValue redacted";
           elt.innerHTML = "Naked or Covered Put";
 
-          eltId = "strikeValue-" + index + "-" + iStrike + "-Div";
+          eltId = "strikeValue-" + symbol + "-" + shortStrike + "-Div";
           elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "strikeValue text";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " text strikeValue";
           elt.innerHTML = fShortStrike;
 
-          eltId = "deltaValue-" + index + "-" + iStrike + "-Div";
+          eltId = "deltaValue-" + symbol + "-" + shortStrike + "-Div";
           elt = document.getElementById(eltId);
 
           if (elt == null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "deltaValue numeric";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " numeric deltaValue";
           elt.innerHTML = shortOption.delta.toFixed(3);
 
-          eltId = "gammaValue-" + index + "-" + iStrike + "-Div";
+          eltId = "gammaValue-" + symbol + "-" + shortStrike + "-Div";
           elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "gammaValue numeric";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " numeric gammaValue";
           elt.innerHTML = shortOption.gamma.toFixed(3);
 
-          eltId = "thetaValue-" + index + "-" + iStrike + "-Div";
+          eltId = "thetaValue-" + symbol + "-" + shortStrike + "-Div";
           elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "thetaValue numeric";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " numeric thetaValue";
           elt.innerHTML = shortOption.theta.toFixed(3);
 
-          eltId = "vegaValue-" + index + "-" + iStrike + "-Div";
+          eltId = "vegaValue-" + symbol + "-" + shortStrike + "-Div";
           elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "vegaValue numeric";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " numeric vegaValue";
           elt.innerHTML = shortOption.vega.toFixed(3);
 
-          eltId = "markValue-" + index + "-" + iStrike + "-Div";
+          eltId = "markValue-" + symbol + "-" + shortStrike + "-Div";
           elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Div");
             elt.id = eltId;
+            elt.className = "markValue numeric";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " numeric markValue";
           elt.innerHTML = shortOption.mark.toFixed(2);
 
-          eltId = "targetValue-" + index + "-" + iStrike + "-Input";
+          eltId = "targetValue-" + symbol + "-" + shortStrike + "-Input";
           elt = document.getElementById(eltId);
 
           if (elt === null) {
             elt = document.createElement("Input");
             elt.id = eltId;
+            elt.className = "targetValue numeric";
             appendElts.push(elt);
           }
 
-          elt.className = ioatm + " " + oddEven + " numeric targetValue";
-
-          appendElts.forEach(function(elt) {
+          appendElts.forEach((elt) => {
             optionDiv.appendChild(elt);
           })
-        }
+        });
+        log.print("processGetOptionChainResponse: json.status=" + json.status);
       } else {
         log.print("processGetOptionChainResponse: json.status=" + json.status, log.ERROR);
       }
-
-      log.print("ATM Strike: " + atmStrike);
-    } else if(xhr.readyState == 4 && xhr.status == 401) {
-      var symbol;
-      var fromDate;
-      var toDate;
-      var strikeCount;
-
-      log.print("processGetOptionChainResponse: xhr.readyState=" + xhr.readyState + " xhr.status=" + xhr.status);
+    } else if (xhr.readyState == 4 && xhr.status == 401) {
+      log.print(
+        "processGetOptionChainResponse: xhr.readyState=" +
+        xhr.readyState + " xhr.status=" + xhr.status);
+      log.print("processGetOptionChainResponse: auth.refreshToken()", log.WARNING);
       auth.refreshToken();
-  
-      symbol = document.getElementById("symbol" + index + "Div").innerHTML;
-      fromDate = fromDateInput.value;
-      toDate = toDateInput.value;
-      strikeCount = strikeCountSelect.value;
-      log.print("refresh");
-      getOptionChain(symbol, fromDate, toDate, strikeCount, index);
+      log.print("processGetOptionChainResponse: getOptionChain()", log.WARNING);
+      getOptionChain(symbol, fromDate, toDate, strikeCount);
     } else {
-      log.print("processGetOptionChainResponse: xhr.readyState=" + xhr.readyState + " xhr.status=" + xhr.status);
+      log.print(
+        "processGetOptionChainResponse: xhr.readyState=" +
+        xhr.readyState + " xhr.status=" + xhr.status,
+        log.ERROR);
     }
   }
 

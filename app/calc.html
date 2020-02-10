@@ -12,30 +12,31 @@
     <script src="js/calc.js"></script>
   </head>
   <body>
-    <h1 id="titleHeading" class="redacted">Calculator</h1>
+    <h1 id="titleHeading">Calculator</h1>
 
     <section id="authorizationSection" class="panel">
-      <h1 id="authorizationHeading" class="panelTitle">Authorization</h1>
+      <h1 id="authorizationHeading">Authorization</h1>
       <label id="clientIDLabel" for="clientIDInput">Client ID</label>
-      <input id="clientIDInput" class="redacted" type="text" />
+      <input id="clientIDInput" type="text" />
       <label id="redirectURILabel" for="redirectURIInput">Redirect URI</label>
       <input id="redirectURIInput" type="text" />
       <label id="authCodeLabel" for="authCodeInput">Auth Code</label>
       <input id="authCodeInput" type="text" />
-      <button id="getAuthCodeButton" name="getAuthCode">Get Auth Code</button>
-      <button id="getTokenButton" name="getToken">Get Token</button>
-      <button id="refreshTokenButton" name="refreshToken">Refresh Token</button>
+      <button id="getAuthCodeButton">Get Auth Code</button>
+      <button id="getTokenButton">Get Token</button>
+      <button id="refreshTokenButton">Refresh Token</button>
     </section>
 
     <section id="listSection" class="panel">
-      <h1 id="listHeading" class="panelTitle">Watchlist</h1>
-
-      <div id="listControlDiv" class="panelGrid">
-        <label id="fromDateLabel" for="fromDateInput" class="redacted2 numeric header">Start</label>
-        <input id="fromDateInput" type="date" />
-        <label id="toDateLabel" for="toDateInput" class="redacted2 numeric header">End</label>
-        <input id="toDateInput" type="date" />
-        <label id="strikeCountLabel" for="strikeCountSelect" class="redacted2 numeric header">Strikes</label>
+      <h1 id="listHeading">Watchlist</h1>
+      <div id="controlDiv" class="titleControl">
+        <input id="addSymbolInput" type="text" class="symbol" />
+        <button id="addSymbolButton" name="addSymbol" class="icon add" ></button>
+        <label id="fromDateLabel" for="fromDateInput">Start</label>
+        <input id="fromDateInput" type="date" class="date" />
+        <label id="toDateLabel" for="toDateInput">End</label>
+        <input id="toDateInput" type="date" class="date" />
+        <label id="strikeCountLabel" for="strikeCountSelect">Strikes</label>
         <select id="strikeCountSelect">
           <option value="ALL">All</option>
           <option value="3">1 ATM 1</option>
@@ -51,18 +52,18 @@
           <option value="31">15 ATM 15</option>
           <option value="51">25 ATM 25</option>
         </select>
-        <button id="calcButton" name="calc">Calculate</button>
+        <button id="calcButton" name="calc" class="icon go"></button>
       </div>
 
-      <div id="listHeaderDiv" class="panelGrid">
-        <label id="stratLabel" class="redacted2 header">Strategy</label>
-        <label id="strikeLabel" class="redacted2 text header">Strike</label>
-        <label id="widthLabel" class="redacted2 numeric header">Delta</label>
-        <label id="widthLabel" class="redacted2 numeric header">Gamma</label>
-        <label id="pctDistLabel" class="redacted2 numeric header">Theta</label>
-        <label id="zDistLabel" class="redacted2 numeric header">Vega</label>
-        <label id="probItmLabel" class="redacted2 numeric header">Mark</label>
-        <label id="expValLabel" class="redacted2 numeric header">Target</label>
+      <div id="listHeaderDiv" class="subPanel">
+        <label id="stratLabel">Strategy</label>
+        <label id="strikeLabel" class="text">Strike</label>
+        <label id="widthLabel" class="numeric">Delta</label>
+        <label id="widthLabel" class="numeric">Gamma</label>
+        <label id="pctDistLabel" class="numeric">Theta</label>
+        <label id="zDistLabel" class="numeric">Vega</label>
+        <label id="probItmLabel" class="numeric">Mark</label>
+        <label id="expValLabel" class="numeric">Target</label>
       </div>
     </section>
   </body>
