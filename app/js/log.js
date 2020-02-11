@@ -1,6 +1,6 @@
 "use strict";
 
-let log = (function () {
+const log = (function () {
   const SUCCESS = 0;
   const DEBUG = 1;
   const INFO = 2;
@@ -81,4 +81,4 @@ let log = (function () {
       }
     }
   }
-})();
+}());

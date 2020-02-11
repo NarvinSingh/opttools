@@ -275,4 +275,4 @@ let dbgJson;
   }
 
   window.addEventListener("load", initScanner);
-})();
+}());

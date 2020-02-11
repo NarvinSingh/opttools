@@ -1,128 +1,131 @@
-"use strict";
+'use strict';
 
-let auth = (function () {
-  let clientID = "NASAPP@AMER.OAUTHAP";
-  let redirectURI = "http://localhost";
-  let authCode = "";
-  let isRefreshed = false;
+const auth = (function () {
+  const defaultClientID = 'NASAPP@AMER.OAUTHAP';
+  const defaultRedirectURI = 'http://localhost';
+  const authCallbacks = [];
+  
+  let clientID;
+  let redirectURI;
+  let authCode = '';
+  let isUnauthorized = true;
 
   function initAuth() {
-    let inputClientID;
-    let inputRedirectURI;
-    let inputAuthCode;
+    setClientID(localStorage.getItem('auth-clientID') || defaultClientID);
+    setRedirectURI(localStorage.getItem('auth-redirectURI') || defaultRedirectURI);
+  }
 
-    inputClientID = document.getElementById("clientIDInput");
-    inputClientID.value = clientID;
-    inputClientID.addEventListener("input", processInputClientIDInput);
-    inputRedirectURI = document.getElementById("redirectURIInput");
-    inputRedirectURI.value = redirectURI;
-    inputRedirectURI.addEventListener("input", processInputRedirectURIInput);
-    inputAuthCode = document.getElementById("authCodeInput");
-    inputAuthCode.value = authCode;
-    inputAuthCode.addEventListener("input", processInputAuthCodeInput);
-    document.getElementById("getAuthCodeButton").addEventListener(
-      "click", processButtonGetAuthCodeClick);
-    document.getElementById("getTokenButton").addEventListener("click", processButtonGetTokenClick);
-    document.getElementById("refreshTokenButton").addEventListener(
-      "click", processButtonRefreshTokenClick);
+  function getClientID() {
+    return clientID;
+  }
+
+  function setClientID(value) {
+    localStorage.setItem('auth-clientID', value);
+    clientID = value;
+  }
+
+  function getRedirectURI() {
+    return redirectURI;
+  }
+
+  function setRedirectURI(value) {
+    localStorage.setItem('auth-redirectURI', value);
+    redirectURI = value;
   }
 
   function getAuthCodeURI() {
-    return "https://auth.tdameritrade.com/auth?" +
-      "response_type=code" +
-      "&redirect_uri=" + encodeURIComponent(redirectURI) +
-      "&client_id=" + encodeURIComponent(clientID);
+    return `https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=${encodeURIComponent(redirectURI)}&client_id=${encodeURIComponent(clientID)}`;
+  }
+
+  function setAuthCode(value) {
+    authCode = value;
   }
 
   function getToken() {
-    let uri = "https://api.tdameritrade.com/v1/oauth2/token";
-    let body = "grant_type=authorization_code" +
-      "&access_type=offline" +
-      "&code=" + encodeURIComponent(authCode) +
-      "&client_id=" + encodeURIComponent(clientID) +
-      "&redirect_uri=" + encodeURIComponent(redirectURI);
-    xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = processGetTokenResponse;
-    xhr.open("POST", uri);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    return localStorage.getItem('auth-accessToken');
+  }
+
+  function getIsUnauthorized() {
+    return isUnauthorized;
+  }
+
+  function setIsUnauthorized(value) {
+    isUnauthorized = !!(value === 'false' ? false : value);
+    authCallbacks.forEach((callback) => callback.call(this, !isUnauthorized));
+  }
+
+  function requestToken() {
+    let uri = 'https://api.tdameritrade.com/v1/oauth2/token';
+    let body = `grant_type=authorization_code&access_type=offline&code=${encodeURIComponent(authCode)}&client_id=${encodeURIComponent(clientID)}&redirect_uri=${encodeURIComponent(redirectURI)}`;
+    let xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = processTokenResponse;
+    xhr.open('POST', uri);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.send(body);
-    log.print("getToken body: " + body);
+    log.print(`requestToken body: ${body}`);
   }
 
-  function forceRefreshToken() {
-    isRefreshed = false;
-    refreshToken();
+  function refreshToken() {
+    let uri = 'https://api.tdameritrade.com/v1/oauth2/token';
+    let body = `grant_type=refresh_token&refresh_token=${encodeURIComponent(localStorage.refreshToken)}&access_type=offline&client_id=${encodeURIComponent(clientID)}`;
+    let xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = processTokenResponse;
+    xhr.open('POST', uri);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.send(body);
+    log.print(`refreshToken body: ${body}`);
   }
 
-  function processInputClientIDInput() {
-    clientID = decodeURIComponent(this.value);
-  }
-
-  function processInputRedirectURIInput() {
-    redirectURI = decodeURIComponent(this.value);
-  }
-
-  function processInputAuthCodeInput() {
-    authCode = decodeURIComponent(this.value);
-  }
-
-  function processButtonGetAuthCodeClick() {
-    window.open(getAuthCodeURI());
-  }
-
-  function processButtonGetTokenClick() {
-    getToken();
-  }
-
-  function processButtonRefreshTokenClick() {
-    forceRefreshToken();
-  }
-
-  function processGetTokenResponse() {
-    if (this.readyState == 4 && this.status == 200) {
-      let json = JSON.parse(this.responseText);
-      localStorage.accessToken = json.access_token;
-      localStorage.refreshToken = json.refresh_token;
-      log.print("processGetTokenResponse: " + this.responseText);
-    } else {
-      log.print("processGetTokenResponse: readyState="
-        + this.readyState + " status=" + this.status, log.WARNING);
+  function addAuthCallback(callback) {
+    if (!authCallbacks.includes(callback)) {
+      authCallbacks.push(callback);
     }
   }
 
-  function processRefreshTokenResponse() {
-    if (this.readyState == 4 && this.status == 200) {
-      let json = JSON.parse(this.responseText);
-      localStorage.accessToken = json.access_token;
-      localStorage.refreshToken = json.refresh_token;
-      log.print("processRefreshTokenResponse: " + this.responseText);
-    } else {
-      log.print("processRefreshTokenResponse: readyState="
-        + this.readyState + " status=" + this.status, log.WARNING);
+  function removeAuthCallback(callback) {
+    const index = authCallbacks.indexOf(callback);
+
+    if (index !== -1) {
+      authCallbacks.splice(index, 1);
     }
   }
 
-  window.addEventListener("load", initAuth);
+  function processTokenResponse() {
+    if (this.readyState == 4 && this.status == 200) {
+      let json = JSON.parse(this.responseText);
+
+      localStorage.setItem('auth-accessToken', json.access_token);
+      localStorage.setItem('auth-refreshToken', json.refresh_token);
+      isUnauthorized = false;
+      authCallbacks.forEach((callback) => callback.call(this, true));
+      log.print(`processTokenResponse: ${this.responseText}`);
+    } else {
+      isUnauthorized = true;
+      authCallbacks.forEach((callback) => callback.call(this, false));
+      log.print(
+        `processTokenResponse: readyState=${this.readyState} status=${this.status}`,
+        log.WARNING
+      );
+    }
+  }
+
+  window.addEventListener('load', initAuth);
 
   return {
-    refreshToken: function() {
-      if (isRefreshed) {
-        return;
-      }
-
-      isRefreshed = true;
-
-      let uri = "https://api.tdameritrade.com/v1/oauth2/token";
-      let body = "grant_type=refresh_token" +
-        "&refresh_token=" + encodeURIComponent(localStorage.refreshToken) +
-        "&access_type=offline" +
-        "&client_id=" + encodeURIComponent(clientID);
-      let xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = processRefreshTokenResponse;
-      xhr.open("POST", uri);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send(body);
-      log.print("refreshToken body: " + body);
-    }
+    getClientID: getClientID,
+    setClientID: setClientID,
+    getRedirectURI: getRedirectURI,
+    setRedirectURI: setRedirectURI,
+    getAuthCodeURI: getAuthCodeURI,
+    setAuthCode: setAuthCode,
+    getToken: getToken,
+    getIsUnauthorized: getIsUnauthorized,
+    setIsUnauthorized: setIsUnauthorized,
+    requestToken: requestToken,
+    refreshToken: refreshToken,
+    addAuthCallback: addAuthCallback,
+    removeAuthCallback: removeAuthCallback
   }
-})();
+}());

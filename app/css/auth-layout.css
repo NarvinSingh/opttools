@@ -4,7 +4,7 @@
     "clientIDLabel clientIDInput clientIDInput clientIDInput"
     "redirectURILabel redirectURIInput redirectURIInput redirectURIInput"
     "authCodeLabel authCodeInput authCodeInput authCodeInput"
-    ". getAuthCodeButton getTokenButton refreshTokenButton"
+    ". getAuthCodeButton requestTokenButton refreshTokenButton"
     / max-content auto auto auto;
 }
 
@@ -40,8 +40,8 @@
   grid-area: getAuthCodeButton;
 }
 
-#getTokenButton {
-  grid-area: getTokenButton;
+#requestTokenButton {
+  grid-area: requestTokenButton;
 }
 
 #refreshTokenButton {
