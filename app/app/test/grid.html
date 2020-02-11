@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Test: Grid</title>
+    <style type="text/css">
+        #ruler {
+            display: grid;
+            grid-template: "r1 r2 r3"
+                / 1fr 1fr 1fr;
+            width: 300px;
+        }
+
+        #r1 {
+            grid-area: r1;
+            background-color: blue;
+            text-align: center;
+        }
+
+        #r2 {
+            grid-area: r2;
+            background-color: green;
+            text-align: center;
+        }
+
+        #r3 {
+            grid-area: r3;
+            background-color: red;
+            text-align: center;
+        }
+
+        #container {
+            display: grid;
+            grid-template: "r1c1 r1c2 r1c3"
+                / 1fr 1fr 1fr;
+            width: 300px;
+            background-color: yellow;
+        }
+
+/*        #container > div, input {
+            min-width: 0;
+        }
+*/
+        #r1c1 {
+            grid-area: r1c1;
+            background-color: blue;
+        }
+
+        #r1c2 {
+            grid-area: r1c2;
+            width: 50px;
+            background-color: green;
+        }
+
+        #r1c3 {
+            grid-area: r1c3;
+            background-color: red;
+        }
+    </style>
+  </head>
+  <body>
+    <h1 id="titleHeading" class="redacted">Test: Grid</h1>
+    <div id="ruler">
+        <div id="r1">1</div>
+        <div id="r2">2</div>
+        <div id="r3">3</div>
+    </div>
+    <div id="container">
+        <div id="r1c1">R1C1</div>
+        <input id="r1c2" type="text" name="input1">
+        <div id="r1c3">R1C3</div>
+    </div>
+  </body>
+</html>

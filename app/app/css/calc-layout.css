@@ -1,0 +1,85 @@
+#controlDiv {
+  grid-template-columns: repeat(9, auto);
+}
+
+#listHeaderDiv {
+  grid-template-columns: repeat(9, 1fr);
+}
+
+.underlying {
+  grid-template:
+    "deleteButton symbolValue lastValue last targetValue target volmValue volm exp expValue"
+    / 1fr 4fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr;
+}
+
+.underlying > button.delete {
+  margin-left: .5em;
+/*  border: none;
+  padding: 0;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url(../img/icon-delete.png);
+  background-size: contain;
+*/}
+
+.underlying > .symbolValue {
+  grid-area: symbolValue;
+}
+
+.underlying > .last {
+  grid-area: last;
+}
+
+.underlying > .lastValue {
+  grid-area: lastValue;
+  text-align: right;
+}
+
+.underlying > .target {
+  grid-area: target;
+}
+
+.underlying > div.targetValue {
+  grid-area: targetValue;
+  padding: 0;
+  text-align: right;
+}
+
+.underlying input {
+  padding: 0 .5em;
+  width: 5em;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}
+
+.underlying > .volm {
+  grid-area: volm;
+}
+
+.underlying > .volmValue {
+  grid-area: volmValue;
+  text-align: right;
+}
+
+.underlying > .exp {
+  grid-area: exp;
+  text-align: right;
+}
+
+.underlying > .expValue {
+  grid-area: expValue;
+}
+
+.option {
+  grid-template-columns: repeat(9, 1fr);
+}
+
+.option input {
+  padding: 0 .5em;
+  width: 5em;
+  height: 1em;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}

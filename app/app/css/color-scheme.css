@@ -1,0 +1,96 @@
+body {
+  color: #333;
+  background-color: #FFC;
+}
+
+.panel {
+  border-color: #BBB;
+  background-color: #EEE;
+}
+
+.panel > h1 {
+  border-color: #BBB;
+  background-color: #66F;
+}
+
+.panel input {
+  color: #333;
+  border-color: #BBB;
+}
+
+.panel button {
+  color: #333;
+}
+
+.panel > .titleControl {
+  border-color: #BBB;
+  background-color: #66F;
+}
+
+.panel > .titleControl input,
+.panel > .titleControl button,
+.panel > .titleControl select {
+  border-color: #BBB;
+  background-color: #66F;
+  color: #EEE;
+}
+
+#listHeaderDiv {
+  border-top-color: #CCC;
+  border-bottom-color: #CCC;
+  background-color: #99F;
+}
+
+#listHeaderDiv > label {
+  border-color: #CCC;
+}
+
+.underlying {
+  border-top-color: #777;
+  border-bottom-color: #333;
+  background-color: #66A;
+  color: #EEE;
+}
+
+.underlying > button.icon {
+  background-color: #66A;
+}
+
+.underlying input {
+  border-color: #BBB;
+  background-color: #66A;
+  color: #EEE;
+}
+
+.option {
+  border-color: #CCC;
+}
+
+.option input {
+  border-color: #EEE;
+}
+
+.option.itm.odd,
+.option.itm.odd input {
+  background-color: #ECC;
+}
+
+.option.itm.even,
+.option.itm.even input {
+  background-color: #DCC;
+}
+
+.option.atm,
+.option.atm input {
+  background-color: #CCE;
+}
+
+.option.otm.odd,
+.option.otm.odd input {
+  background-color: #CEC;
+}
+
+.option.otm.even,
+.option.otm.even input {
+  background-color: #CDC;
+}
