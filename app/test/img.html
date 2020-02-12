@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Test: Grid</title>
+    <style type='text/css'>
+      #row {
+        display: grid;
+        border: 2px solid #666;
+        padding: 10px;
+        grid-gap: 10px;
+        width: max-content;
+        grid-auto-flow: column;
+      }
+
+      button {
+        margin: 0;
+        border: none;
+        padding: 0;
+        width: 16px;
+        height: 16px;
+        background-color: transparent;
+        filter: invert(70%) sepia(42%) saturate(7032%) hue-rotate(83deg) brightness(117%) contrast(127%);
+      }
+
+      #button1 {
+        background-image: url(../img/play.svg);
+      }
+
+      #button2 {
+        background-image: url(../img/stop.svg);
+      }
+
+      #button3 {
+        background-image: url(../img/pause.svg);
+      }
+
+      #button4 {
+        background-image: url(../img/add.svg);
+      }
+
+      #button5 {
+        background-image: url(../img/delete.svg);
+      }
+
+      #button6 {
+        background-image: url(../img/play-1.svg);
+      }
+
+      #button7 {
+        background-image: url(../img/stop-1.svg);
+      }
+
+      #button8 {
+        background-image: url(../img/pause-1.svg);
+      }
+
+      #button9 {
+        background-image: url(../img/add-1.svg);
+      }
+
+      #button10 {
+        background-image: url(../img/delete-1.svg);
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id='titleHeading' class='redacted'>Test: Image</h1>
+    <div id='row'>
+      <button id='button1'></button>
+      <button id='button2'></button>
+      <button id='button3'></button>
+      <button id='button4'></button>
+      <button id='button5'></button>
+      <button id='button6'></button>
+      <button id='button7'></button>
+      <button id='button8'></button>
+      <button id='button9'></button>
+      <button id='button10'></button>
+    </div>
+  </body>
+</html>

@@ -31,7 +31,7 @@ const watchlistUI = (function () {
     let elt = document.createElement('button');
     elt.id = `delete-${symbol}-Button`;
     elt.className = 'icon delete';
-    elt.addEventListener('click', handleButtonDeleteSymbolClick);
+    elt.addEventListener('click', handleDeleteSymbolButtonEvent);
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement('div');
@@ -103,7 +103,7 @@ const watchlistUI = (function () {
     listSection.removeChild(symbolDiv);
   }
 
-  function handleButtonDeleteSymbolClick(event) {
+  function handleDeleteSymbolButtonEvent(event) {
     const symbol = event.currentTarget.id.split('-')[1];
 
     unloadSymbol(symbol);

@@ -14,13 +14,7 @@
 
 .underlying > button.delete {
   margin-left: .5em;
-/*  border: none;
-  padding: 0;
-  width: 1.2em;
-  height: 1.2em;
-  background-image: url(../img/icon-delete.png);
-  background-size: contain;
-*/}
+}
 
 .underlying > .symbolValue {
   grid-area: symbolValue;

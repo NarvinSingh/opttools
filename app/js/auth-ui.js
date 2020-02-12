@@ -6,39 +6,39 @@
     let inputRedirectURI = document.getElementById('redirectURIInput');
 
     inputClientID.value = auth.getClientID();
-    inputClientID.addEventListener('input', handleInputClientIDInput);
+    inputClientID.addEventListener('input', handleClientIDInputEvent);
     inputRedirectURI.value = auth.getRedirectURI();
-    inputRedirectURI.addEventListener('input', handleInputRedirectURIInput);
-    document.getElementById('authCodeInput').addEventListener('input', handleInputAuthCodeInput);
+    inputRedirectURI.addEventListener('input', handleRedirectURIInputEvent);
+    document.getElementById('authCodeInput').addEventListener('input', handleAuthCodeInputEvent);
     document.getElementById('getAuthCodeButton')
-      .addEventListener('click', handleButtonGetAuthCodeClick);
+      .addEventListener('click', handleGetAuthCodeButtonEvent);
     document.getElementById('requestTokenButton')
-      .addEventListener('click', handleButtonRequestTokenClick);
+      .addEventListener('click', handleRequestTokenButtonEvent);
     document.getElementById('refreshTokenButton')
-      .addEventListener('click', handleButtonRefreshTokenClick);
+      .addEventListener('click', handleRefreshTokenButtonEvent);
   }
 
-  function handleInputClientIDInput() {
+  function handleClientIDInputEvent() {
     auth.setClientID(decodeURIComponent(this.value));
   }
 
-  function handleInputRedirectURIInput() {
+  function handleRedirectURIInputEvent() {
     auth.setRedirectURI(decodeURIComponent(this.value));
   }
 
-  function handleInputAuthCodeInput() {
+  function handleAuthCodeInputEvent() {
     auth.setAuthCode(decodeURIComponent(this.value));
   }
 
-  function handleButtonGetAuthCodeClick() {
+  function handleGetAuthCodeButtonEvent() {
     window.open(auth.getAuthCodeURI());
   }
 
-  function handleButtonRequestTokenClick() {
+  function handleRequestTokenButtonEvent() {
     auth.requestToken();
   }
 
-  function handleButtonRefreshTokenClick() {
+  function handleRefreshTokenButtonEvent() {
     auth.refreshToken();
   }
 

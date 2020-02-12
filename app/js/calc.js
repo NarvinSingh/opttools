@@ -7,61 +7,61 @@ let dbgJson;
   const defaultStrikeCount = 13;
 
   let addSymbolInput;
+  let addSymbolButton;
   let fromDateInput;
-  let toDateInput;
   let strikeCountSelect;
   let calcButton;
   let intervalId = null;
   let isPaused = false;
   let isRefreshing = false;
+  let isStale = false;
 
   function initCalc() {
     const nowDate = (new Date()).toISOString().substr(0, 10);
 
     addSymbolInput = document.getElementById('addSymbolInput');
-    document.getElementById('addSymbolButton').addEventListener(
-      'click',
-      handleButtonAddSymbolClick
-    );
+    addSymbolInput.addEventListener('keyup', handleAddSymbolInputEvent);
+    addSymbolButton = document.getElementById('addSymbolButton')
+    addSymbolButton.addEventListener('click', handleAddSymbolButtonEvent);
     fromDateInput = document.getElementById('fromDateInput');
-    fromDateInput.addEventListener('input', handleInputFromDateInput);
-    toDateInput = document.getElementById('toDateInput');
-    toDateInput.addEventListener('input', handleInputToDateInput);
+    fromDateInput.addEventListener('input', handleFromDateInputEvent);
     strikeCountSelect = document.getElementById('strikeCountSelect');
-    strikeCountSelect.addEventListener('input', handleSelectStrikeCountInput);
+    strikeCountSelect.addEventListener('input', handleSelectStrikeCountEvent);
     fromDateInput.value = localStorage.getItem('calc-fromDate') || nowDate;
-    toDateInput.value = localStorage.getItem('calc-toDate') || fromDateInput.value;
     strikeCountSelect.value = localStorage.getItem('calc-strikeCount') || defaultStrikeCount;
     calcButton = document.getElementById('calcButton');
-    calcButton.addEventListener('click', handleButtonCalcClick);
+    calcButton.addEventListener('click', handleCalcButtonEvent);
     auth.addAuthCallback(handleAuthNotification);
   }
 
-  function calc() {
-    // if (!checkAuthAndRefresh()) {
-    //   log.print('calc: checkAuthAndRefresh() failed', log.WARNING);
-    //   stopCalcInterval();
-
-    //   return;
-    // }
-
+  function clearChains() {
     watchlist.getList().forEach((symbol) => {
-      getOptionChain(symbol, fromDateInput.value, toDateInput.value, strikeCountSelect.value);
+      let rowDiv = document.getElementById(`listRow-${symbol}-Div`);
+      let chainDiv = document.getElementById(`chain-${symbol}-Div`);
+
+      if (rowDiv && chainDiv) {
+        rowDiv.removeChild(chainDiv);
+      }
     });
   }
 
-  function getOptionChain(symbol, fromDate, toDate, strikeCount) {
-    // if (!checkAuthAndRefresh()) {
-    //   log.print('getOptionChain: checkAuthAndRefresh() failed', log.WARNING);
+  function calc() {
+    if (isStale) {
+      clearChains();
+      isStale = false;
+    }
 
-    //   return;
-    // }
+    watchlist.getList().forEach((symbol) => {
+      getOptionChain(symbol, fromDateInput.value, strikeCountSelect.value);
+    });
+  }
 
-    const uri = `https://api.tdameritrade.com/v1/marketdata/chains?symbol=${symbol}&includeQuotes=TRUE&strikeCount=${strikeCount}&fromDate=${fromDate}&toDate=${toDate}`;
+  function getOptionChain(symbol, fromDate, strikeCount) {
+    const uri = `https://api.tdameritrade.com/v1/marketdata/chains?symbol=${symbol}&includeQuotes=TRUE&strikeCount=${strikeCount}&fromDate=${fromDate}&toDate=${fromDate}`;
     const xhr = new XMLHttpRequest();
     
     xhr.onreadystatechange = function() {
-      handleGetOptionChainResponse(xhr, symbol, fromDate, toDate, strikeCount);
+      handleGetOptionChainResponse(xhr, symbol, fromDate, strikeCount);
     };
     xhr.open('GET', uri);
     xhr.setRequestHeader('Authorization', 'Bearer ' + auth.getToken());
@@ -69,7 +69,7 @@ let dbgJson;
     log.print('getOptionChain: ' + uri);
   }
 
-  function handleGetOptionChainResponse(xhr, symbol, fromDate, toDate, strikeCount) {
+  function handleGetOptionChainResponse(xhr, symbol, fromDate, strikeCount) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       const json = JSON.parse(xhr.responseText);
 
@@ -262,16 +262,6 @@ let dbgJson;
         `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`
       );
       auth.setIsUnauthorized(true);
-
-      // if (!checkAuthAndRefresh()) {
-      //   log.print('handleGetOptionChainResponse: checkAuthAndRefresh() failed', log.WARNING);
-
-      //   return;
-      // }
-      // log.print('handleGetOptionChainResponse: auth.refreshToken()', log.WARNING);
-      // auth.refreshToken();
-      // log.print('handleGetOptionChainResponse: getOptionChain()', log.WARNING);
-      // getOptionChain(symbol, fromDate, toDate, strikeCount);
     } else {
       log.print(
         `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`,
@@ -280,7 +270,13 @@ let dbgJson;
     }
   }
 
-  function handleButtonAddSymbolClick() {
+  function handleAddSymbolInputEvent(event) {
+    if (event.keyCode === 13) {
+      addSymbolButton.click();
+    }
+  }
+
+  function handleAddSymbolButtonEvent() {
     const symbol = addSymbolInput.value;
 
     watchlist.addSymbol(symbol);
@@ -288,25 +284,32 @@ let dbgJson;
     addSymbolInput.value = '';
 
     if (intervalId !== null) {
-      getOptionChain(symbol, fromDateInput.value, toDateInput.value, strikeCountSelect.value);
+      getOptionChain(symbol, fromDateInput.value, strikeCountSelect.value);
     }
   }
 
-  function handleInputFromDateInput() {
+  function handleFromDateInputEvent() {
     localStorage.setItem('calc-fromDate', fromDateInput.value);
+
+    if (intervalId !== null) {
+      calc();
+    }
   }
 
-  function handleInputToDateInput() {
-    localStorage.setItem('calc-toDate', toDateInput.value);
-  }
-
-  function handleSelectStrikeCountInput() {
+  function handleSelectStrikeCountEvent() {
     localStorage.setItem('calc-strikeCount', strikeCountSelect.value);
+
+    if (intervalId !== null) {
+      clearChains();
+      calc();
+    } else {
+      isStale = true;
+    }
   }
 
-  function handleButtonCalcClick() {
+  function handleCalcButtonEvent() {
     if (isPaused) {
-      log.print('handleButtonCalcClick: calculation paused');
+      log.print('handleCalcButtonEvent: calculation paused');
 
       return;
     }
@@ -330,12 +333,13 @@ let dbgJson;
         calcButton.className = 'icon stop';
         calc();
         intervalId = setInterval(calc, calcInterval);
+        isPaused = false;
       }
 
       isRefreshing = false;
     } else {
       if (intervalId !== null) {
-        calcButton.className = 'icon go';
+        calcButton.className = 'icon pause';
         clearInterval(intervalId);
         intervalId = null;
         isPaused = true;
@@ -350,46 +354,3 @@ let dbgJson;
 
   window.addEventListener('load', initCalc);
 }());
-
-  // function checkAuthAndRefresh() {
-  //   if (auth.getIsUnauthorized()) {
-  //     log.print('checkAuthAndRefresh: unauthorized', log.WARNING);
-
-  //     if (!isRefreshing) {
-  //       isRefreshing = true;
-  //       log.print('checkAuthAndRefresh: auth.refreshToken()', log.WARNING);
-  //       auth.refreshToken();
-  //     }
-      
-  //     return false;
-  //   }
-
-  //   isRefreshing = false;
-
-  //   return true;
-  // }
-
-  // function startCalcInterval() {
-  //   if (intervalId !== null) {
-  //     log.print('startCalcInterval: calc already started.', log.WARNING);
-
-  //     return;
-  //   }
-
-  //   calcButton.className = 'icon stop';
-  //   calc();
-  //   intervalId = setInterval(calc, calcInterval);
-  // }
-
-  // function stopCalcInterval() {
-  //   calcButton.className = 'icon go';
-
-  //   if (intervalId === null) {
-  //     log.print('stopCalcInterval: calc already stopped.', log.WARNING);
-
-  //     return;
-  //   }
-
-  //   clearInterval(intervalId);
-  //   intervalId = null;
-  // }

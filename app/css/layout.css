@@ -20,19 +20,23 @@ button.icon {
 }
 
 button.add {
-  background-image: url(../img/icon-add.png);
+  background-image: url(../img/add-1.svg);
 }
 
 button.delete {
-  background-image: url(../img/icon-delete.png);
+  background-image: url(../img/delete-1.svg);
 }
 
 button.go {
-  background-image: url(../img/icon-go.png);
+  background-image: url(../img/play-1.svg);
 }
 
 button.stop {
-  background-image: url(../img/icon-stop.png);
+  background-image: url(../img/stop-1.svg);
+}
+
+button.pause {
+  background-image: url(../img/pause-1.svg);
 }
 
 #titleHeading {
@@ -79,6 +83,19 @@ button.stop {
   border-bottom: 1px solid;
   padding: .1333em .5em;
   text-align: right;
+}
+
+.panel > .titleControl > .break {
+  margin-right: .8333em;
+}
+
+.panel > .titleControl > input.break,
+.panel > .titleControl > select.break {
+  margin-right: .9259em;
+}
+
+.panel > .titleControl > .last {
+  margin-right: -.5em;
 }
 
 .panel > .titleControl > input {

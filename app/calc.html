@@ -15,7 +15,7 @@
     <script src='js/calc.js'></script>
   </head>
   <body>
-    <h1 id='titleHeading'><!-- Calculator --></h1>
+    <h1 id='titleHeading'>Calculator</h1>
 
     <section id='authorizationSection' class='panel'>
       <h1 id='authorizationHeading'>Authorization</h1>
@@ -34,13 +34,11 @@
       <h1 id='listHeading'>Watchlist</h1>
       <div id='controlDiv' class='titleControl'>
         <input id='addSymbolInput' type='text' class='symbol' />
-        <button id='addSymbolButton' name='addSymbol' class='icon add' ></button>
+        <button id='addSymbolButton' name='addSymbol' class='icon add break' ></button>
         <label id='fromDateLabel' for='fromDateInput'>Start</label>
-        <input id='fromDateInput' type='date' class='date' />
-        <label id='toDateLabel' for='toDateInput'>End</label>
-        <input id='toDateInput' type='date' class='date' />
+        <input id='fromDateInput' type='date' class='date break' />
         <label id='strikeCountLabel' for='strikeCountSelect'>Strikes</label>
-        <select id='strikeCountSelect'>
+        <select id='strikeCountSelect' class='break'>
           <option value='ALL'>All</option>
           <option value='3'>1 ATM 1</option>
           <option value='5'>2 ATM 2</option>
@@ -55,7 +53,7 @@
           <option value='31'>15 ATM 15</option>
           <option value='51'>25 ATM 25</option>
         </select>
-        <button id='calcButton' name='calc' class='icon go'></button>
+        <button id='calcButton' name='calc' class='icon go last'></button>
       </div>
 
       <div id='listHeaderDiv' class='subPanel'>
