@@ -11,6 +11,7 @@ let dbgJson;
   let fromDateInput;
   let strikeCountSelect;
   let calcButton;
+  let listSection;
   let intervalId = null;
   let isPaused = false;
   let isRefreshing = false;
@@ -31,7 +32,105 @@ let dbgJson;
     strikeCountSelect.value = localStorage.getItem('calc-strikeCount') || defaultStrikeCount;
     calcButton = document.getElementById('calcButton');
     calcButton.addEventListener('click', handleCalcButtonEvent);
+    listSection = document.getElementById('listSection');
+    watchlist.getList().forEach((symbol) => loadSymbol(symbol));
     auth.addAuthCallback(handleAuthNotification);
+  }
+
+  function loadSymbol(symbol) {
+    const listRowDivId = `listRow-${symbol}-Div`;
+    
+    let listRowDiv = document.getElementById(listRowDivId);
+
+    if (listRowDiv !== null) {
+      log.print(`loadSymbol: ${symbol} already loaded`, log.WARNING);
+
+      return;
+    }
+
+    listRowDiv = document.createElement('div');
+    listRowDiv.id = `listRow-${symbol}-Div`;
+    listRowDiv.className = 'listRow';
+
+    const underlyingDiv = document.createElement('div');
+    underlyingDiv.id = `underlying-${symbol}-Div`;
+    underlyingDiv.className = 'subPanel underlying';
+    listRowDiv.appendChild(underlyingDiv);
+
+    let elt = document.createElement('button');
+    elt.id = `delete-${symbol}-Button`;
+    elt.className = 'icon delete';
+    elt.addEventListener('click', handleDeleteSymbolButtonEvent);
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('div');
+    elt.id = `symbol-${symbol}-Div`;
+    elt.className = 'symbolValue';
+    elt.innerHTML = symbol;
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('label');
+    elt.id = `last-${symbol}-Label`;
+    elt.className = 'last';
+    elt.innerHTML = 'Last';
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('div');
+    elt.id = `lastValue-${symbol}-Div`;
+    elt.className = 'lastValue';
+    elt.innerHTML = '--';
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('label');
+    elt.id = `target-${symbol}-Label`;
+    elt.className = 'target';
+    elt.innerHTML = 'Target';
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('input');
+    elt.id = `targetValue-${symbol}-Input`;
+    elt.className = 'targetValue';
+    elt.addEventListener('keyup', handleTargetValueInputEvent);
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('label');
+    elt.id = `volm-${symbol}-Label`;
+    elt.className = 'volm';
+    elt.innerHTML = 'Volume';
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('div');
+    elt.id = `volmValue-${symbol}-Div`;
+    elt.className = 'volmValue';
+    elt.innerHTML = '--';
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('label');
+    elt.id = `exp-${symbol}-Label`;
+    elt.className = 'exp';
+    elt.innerHTML = 'Expiration';
+    underlyingDiv.appendChild(elt);
+
+    elt = document.createElement('div');
+    elt.id = `expValue-${symbol}-Div`;
+    elt.className = 'expValue';
+    elt.innerHTML = '--';
+    underlyingDiv.appendChild(elt);
+
+    listSection.appendChild(listRowDiv);
+    log.print(`loadSymbol: ${symbol} loaded`);
+  }
+
+  function unloadSymbol(symbol) {
+    const symbolDiv = document.getElementById(`listRow-${symbol}-Div`);
+
+    if (symbolDiv === null) {
+      log.print(`unloadSymbol: ${symbol} not loaded`, log.WARNING);
+      
+      return;
+    }
+ 
+    listSection.removeChild(symbolDiv);
   }
 
   function clearChains() {
@@ -54,6 +153,13 @@ let dbgJson;
     watchlist.getList().forEach((symbol) => {
       getOptionChain(symbol, fromDateInput.value, strikeCountSelect.value);
     });
+  }
+
+  function calcChain(symbol, target) {
+    const chainDiv = document.getElementById(`chain-${Symbol}-Div`);
+    const divs = chainDiv.getElementsByClassName('option');
+
+    log.print(`calcChain: symbol=${symbol} target=${target}`, log.DEBUG);
   }
 
   function getOptionChain(symbol, fromDate, strikeCount) {
@@ -280,12 +386,19 @@ let dbgJson;
     const symbol = addSymbolInput.value;
 
     watchlist.addSymbol(symbol);
-    watchlistUI.loadSymbol(symbol);
+    loadSymbol(symbol);
     addSymbolInput.value = '';
 
     if (intervalId !== null) {
       getOptionChain(symbol, fromDateInput.value, strikeCountSelect.value);
     }
+  }
+
+  function handleDeleteSymbolButtonEvent(event) {
+    const symbol = event.currentTarget.id.split('-')[1];
+
+    unloadSymbol(symbol);
+    watchlist.deleteSymbol(symbol);
   }
 
   function handleFromDateInputEvent() {
@@ -323,6 +436,22 @@ let dbgJson;
       clearInterval(intervalId);
       intervalId = null;
     }
+  }
+
+  function handleTargetValueInputEvent() {
+    if (event.keyCode !== 13) {
+      return;
+    }
+
+    const fTargetValue = parseFloat(this.value);
+
+    if (isNaN(fTargetValue)) {
+      log.print(`handleTargetValueInputEvent: ${this.value} is not a number`, log.WARNING);
+
+      return;
+    }
+
+    calcChain(this.id.split('-')[1], fTargetValue);
   }
 
   function handleAuthNotification(isAuthorized) {

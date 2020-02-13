@@ -27,7 +27,11 @@
   }
 
   function handleAuthCodeInputEvent() {
-    auth.setAuthCode(decodeURIComponent(this.value));
+    const value = this.value;
+
+    let index = value.indexOf('code=');
+
+    auth.setAuthCode(decodeURIComponent(index !== -1 ? value.substr(index + 5) : value));
   }
 
   function handleGetAuthCodeButtonEvent() {
