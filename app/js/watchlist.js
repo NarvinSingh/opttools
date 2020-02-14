@@ -34,7 +34,6 @@ const watchlist = (function () {
 
     list.push(symbol);
     localStorage.setItem('watchlist-list', list.join(','));
-    log.print(`addSymbol: ${symbol} added to watchlist`);
   }
 
   function deleteSymbol(symbol) {
@@ -56,7 +55,6 @@ const watchlist = (function () {
 
     list.splice(index, 1);
     localStorage.setItem('watchlist-list', list.join(','));
-    log.print(`deleteSymbol: ${symbol} removed from watchlist`);
   }
 
   window.addEventListener('load', initWatchlist);

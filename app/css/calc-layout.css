@@ -8,7 +8,7 @@
 
 .underlying {
   grid-template:
-    "deleteButton symbolValue lastValue last targetValue target volmValue volm exp expValue"
+    "deleteButton symbolVal lastVal last targetVal target volmVal volm exp expVal"
     / 1fr 4fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr;
 }
 
@@ -16,16 +16,16 @@
   margin-left: .5em;
 }
 
-.underlying > .symbolValue {
-  grid-area: symbolValue;
+.underlying > .symbolVal {
+  grid-area: symbolVal;
 }
 
 .underlying > .last {
   grid-area: last;
 }
 
-.underlying > .lastValue {
-  grid-area: lastValue;
+.underlying > .lastVal {
+  grid-area: lastVal;
   text-align: right;
 }
 
@@ -33,8 +33,8 @@
   grid-area: target;
 }
 
-.underlying > div.targetValue {
-  grid-area: targetValue;
+.underlying > div.targetVal {
+  grid-area: targetVal;
   padding: 0;
   text-align: right;
 }
@@ -51,8 +51,8 @@
   grid-area: volm;
 }
 
-.underlying > .volmValue {
-  grid-area: volmValue;
+.underlying > .volmVal {
+  grid-area: volmVal;
   text-align: right;
 }
 
@@ -61,8 +61,8 @@
   text-align: right;
 }
 
-.underlying > .expValue {
-  grid-area: expValue;
+.underlying > .expVal {
+  grid-area: expVal;
 }
 
 .option {

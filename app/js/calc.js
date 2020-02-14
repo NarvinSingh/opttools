@@ -3,7 +3,7 @@
 let dbgJson;
 
 (function () {
-  const calcInterval = 15000;
+  const calcInterval = 30000;
   const defaultStrikeCount = 13;
 
   let addSymbolInput;
@@ -15,7 +15,6 @@ let dbgJson;
   let intervalId = null;
   let isPaused = false;
   let isRefreshing = false;
-  let isStale = false;
 
   function initCalc() {
     const nowDate = (new Date()).toISOString().substr(0, 10);
@@ -65,7 +64,7 @@ let dbgJson;
 
     elt = document.createElement('div');
     elt.id = `symbol-${symbol}-Div`;
-    elt.className = 'symbolValue';
+    elt.className = 'symbolVal';
     elt.innerHTML = symbol;
     underlyingDiv.appendChild(elt);
 
@@ -76,8 +75,8 @@ let dbgJson;
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement('div');
-    elt.id = `lastValue-${symbol}-Div`;
-    elt.className = 'lastValue';
+    elt.id = `lastVal-${symbol}-Div`;
+    elt.className = 'lastVal';
     elt.innerHTML = '--';
     underlyingDiv.appendChild(elt);
 
@@ -88,9 +87,9 @@ let dbgJson;
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement('input');
-    elt.id = `targetValue-${symbol}-Input`;
-    elt.className = 'targetValue';
-    elt.addEventListener('keyup', handleTargetValueInputEvent);
+    elt.id = `targetVal-${symbol}-Input`;
+    elt.className = 'targetVal';
+    elt.addEventListener('keyup', handleUnderlyingTargetValInputEvent);
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement('label');
@@ -100,8 +99,8 @@ let dbgJson;
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement('div');
-    elt.id = `volmValue-${symbol}-Div`;
-    elt.className = 'volmValue';
+    elt.id = `volmVal-${symbol}-Div`;
+    elt.className = 'volmVal';
     elt.innerHTML = '--';
     underlyingDiv.appendChild(elt);
 
@@ -112,13 +111,12 @@ let dbgJson;
     underlyingDiv.appendChild(elt);
 
     elt = document.createElement('div');
-    elt.id = `expValue-${symbol}-Div`;
-    elt.className = 'expValue';
+    elt.id = `expVal-${symbol}-Div`;
+    elt.className = 'expVal';
     elt.innerHTML = '--';
     underlyingDiv.appendChild(elt);
 
     listSection.appendChild(listRowDiv);
-    log.print(`loadSymbol: ${symbol} loaded`);
   }
 
   function unloadSymbol(symbol) {
@@ -133,33 +131,251 @@ let dbgJson;
     listSection.removeChild(symbolDiv);
   }
 
-  function clearChains() {
-    watchlist.getList().forEach((symbol) => {
-      let rowDiv = document.getElementById(`listRow-${symbol}-Div`);
-      let chainDiv = document.getElementById(`chain-${symbol}-Div`);
+  function loadChain(symbol, chainData, last) {
+    const strikes = [];
 
-      if (rowDiv && chainDiv) {
-        rowDiv.removeChild(chainDiv);
+    let atmStrike = 0;
+
+    // Sort the strike keys and find the ATM strike
+    Object.keys(chainData).forEach((strike) => {
+      let iStrike = 0;
+
+      while(iStrike < strikes.length && strike < strikes[iStrike]) {
+        iStrike++;
+      }
+
+      strikes.splice(iStrike, 0, strike);
+
+      if (Math.abs(strike - last) < Math.abs(atmStrike - last)) {
+        atmStrike = strike;
+      }
+    });
+
+    const putCall = chainData[atmStrike][0].putCall;
+    const type = putCall.substr(0, 1).toLowerCase();
+    const chainDivId = `${type}Chain-${symbol}-Div`;
+
+    let chainDiv = document.getElementById(chainDivId);
+
+    if (chainDiv === null) {
+      chainDiv = document.createElement('div');
+      chainDiv.id = chainDivId;
+      chainDiv.className = 'chain';
+      document.getElementById(`listRow-${symbol}-Div`).appendChild(chainDiv);
+    }
+
+    const optionDivs = Array.from(chainDiv.getElementsByClassName('option'));
+
+    strikes.forEach((strike, index) => {
+      const option = chainData[strike][0];
+      const optionDivId = `${type}Option-${symbol}-${strike}-Div`;
+      const appendElts = [];
+      
+      let optionDiv = document.getElementById(optionDivId);
+
+      // Insert the option at the correct spot in the chain
+      if (optionDiv === null) {
+        optionDiv = document.createElement('div');
+        optionDiv.id = optionDivId;
+
+        let prevOptionDiv = optionDivs.find((div) => strike > div.id.split('-')[2]) || null;
+
+        chainDiv.insertBefore(optionDiv, prevOptionDiv);
+      }
+
+      // Clear any ITM, ATM, OTM, odd and even classes
+      optionDiv.className = `subPanel option`;
+
+      // Fill in the option values
+      let eltId = `${type}StratVal-${symbol}-${strike}-Div`;
+      let elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'stratVal';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = type === 'c' ? 'Naked or Covered Call' : 'Naked or Covered Put';
+
+      eltId = `${type}StrikeVal-${symbol}-${strike}-Div`;
+      elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'strikeVal text';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = parseFloat(strike);
+
+      eltId = `${type}DeltaVal-${symbol}-${strike}-Div`;
+      elt = document.getElementById(eltId);
+
+      if (elt == null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'deltaVal numeric';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = option.delta.toFixed(3);
+
+      eltId = `${type}GammaVal-${symbol}-${strike}-Div`;
+      elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'gammaVal numeric';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = option.gamma.toFixed(3);
+
+      eltId = `${type}ThetaVal-${symbol}-${strike}-Div`;
+      elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'thetaVal numeric';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = option.theta.toFixed(3);
+
+      eltId = `${type}VegaVal-${symbol}-${strike}-Div`;
+      elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'vegaVal numeric';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = option.vega.toFixed(3);
+
+      eltId = `${type}MarkVal-${symbol}-${strike}-Div`;
+      elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Div');
+        elt.id = eltId;
+        elt.className = 'markVal numeric';
+        appendElts.push(elt);
+      }
+
+      elt.innerHTML = option.mark.toFixed(2);
+
+      eltId = `${type}TargetVal-${symbol}-${strike}-Input`;
+      elt = document.getElementById(eltId);
+
+      if (elt === null) {
+        elt = document.createElement('Input');
+        elt.id = eltId;
+        elt.className = 'targetVal numeric';
+        elt.addEventListener('keyup', handleOptionTargetValInputEvent);
+        appendElts.push(elt);
+      }
+
+      appendElts.forEach((elt) => {
+        optionDiv.appendChild(elt);
+      })
+    });
+
+    // Remove option divs from the chain that are not in the data
+    optionDivs.forEach((div) => {
+      const strike = div.id.split('-')[2];
+
+      if (!strikes.includes(strike)) {
+        chainDiv.removeChild(div);
+      }
+    });
+
+    // Add ITM, ATM, OTM and odd even classes
+    strikes.forEach((strike, index) => {
+      const optionDivId = `${type}Option-${symbol}-${strike}-Div`;
+      const ioatm = strike > atmStrike
+        ? 'itm'
+        : strike < atmStrike
+          ? 'otm'
+          : 'atm';
+      const oddEven = index % 2 ? 'odd' : 'even';
+
+      let optionDiv = document.getElementById(optionDivId);
+
+      optionDiv.className = optionDiv.className + ` ${ioatm} ${oddEven}`;
+    });
+
+    // Recalculate the chain v2 values if s2 is specified on the underlying
+    const s2 = document.getElementById(`targetVal-${symbol}-Input`).value;
+
+    if (!isNaN(s2) && s2 > 0) {
+      calcChain(symbol, type, s2);
+    }
+  }
+
+  function unloadChain(symbol, type) {
+    const listRowDiv = document.getElementById(`listRow-${symbol}-Div`);
+    const chainDiv = document.getElementById(`${type}Chain-${symbol}-Div`);
+
+    listRowDiv && chainDiv && listRowDiv.removeChild(chainDiv);
+  }
+
+  function calcV2(s1, s2, v1, d, g) {
+    return (v1 + (d * (s2 - s1)) + (.5 * g * (s2 - s1) * (s2 - s1)));
+  }
+
+  function calcS2(s1, v1, v2, d, g) {
+    const a = .5 * g;
+    const b = d - (g * s1);
+    const c = (.5 * g * s1 * s1) - (d * s1) + v1 - v2;
+
+    return (-b - Math.sqrt((b * b) - (4 * a * c))) / (2 * a);
+  }
+
+  function calcChain(symbol, type, s2) {
+    log.print(`calcChain: chainDiv.id=${type}Chain-${symbol}-Div s2=${s2}`, log.DEBUG);
+    const chainDiv = document.getElementById(`${type}Chain-${symbol}-Div`);
+    const divs = Array.from(chainDiv.getElementsByClassName('option'));
+    const s1 = parseFloat(document.getElementById(`lastVal-${symbol}-Div`).innerHTML);
+
+    divs.forEach((div) => {
+      if (s2 != 0) {
+        const v1 = parseFloat(div.getElementsByClassName('markVal')[0].innerHTML);
+        const d = parseFloat(div.getElementsByClassName('deltaVal')[0].innerHTML);
+        const g = parseFloat(div.getElementsByClassName('gammaVal')[0].innerHTML);
+        const v2 = calcV2(s1, s2, v1, d, g).toFixed(2);
+
+        div.getElementsByClassName('targetVal')[0].value = v2;
+      } else {
+        div.getElementsByClassName('targetVal')[0].value = '';
       }
     });
   }
 
-  function calc() {
-    if (isStale) {
-      clearChains();
-      isStale = false;
+  function calcUnderlying(symbol, type, strike, v2) {
+    let s2;
+
+    if (v2 != 0) {
+      const div = document.getElementById(`${type}Option-${symbol}-${strike}-Div`);
+      const s1 = parseFloat(document.getElementById(`lastVal-${symbol}-Div`).innerHTML);
+      const v1 = parseFloat(div.getElementsByClassName('markVal')[0].innerHTML);
+      const d = parseFloat(div.getElementsByClassName('deltaVal')[0].innerHTML);
+      const g = parseFloat(div.getElementsByClassName('gammaVal')[0].innerHTML);
+      
+      s2 = calcS2(s1, v1, v2, d, g).toFixed(2);
+    } else {
+      s2 = '';
     }
 
-    watchlist.getList().forEach((symbol) => {
-      getOptionChain(symbol, fromDateInput.value, strikeCountSelect.value);
-    });
-  }
-
-  function calcChain(symbol, target) {
-    const chainDiv = document.getElementById(`chain-${Symbol}-Div`);
-    const divs = chainDiv.getElementsByClassName('option');
-
-    log.print(`calcChain: symbol=${symbol} target=${target}`, log.DEBUG);
+    document.getElementById(`targetVal-${symbol}-Input`).value = s2;
+    calcChain(symbol, 'c', s2);
+    calcChain(symbol, 'p', s2);
   }
 
   function getOptionChain(symbol, fromDate, strikeCount) {
@@ -172,11 +388,20 @@ let dbgJson;
     xhr.open('GET', uri);
     xhr.setRequestHeader('Authorization', 'Bearer ' + auth.getToken());
     xhr.send();
-    log.print('getOptionChain: ' + uri);
+  }
+
+  function getOptionChains() {
+    watchlist.getList().forEach((symbol) => {
+      getOptionChain(symbol, fromDateInput.value, strikeCountSelect.value);
+    });
   }
 
   function handleGetOptionChainResponse(xhr, symbol, fromDate, strikeCount) {
     if (xhr.readyState == 4 && xhr.status == 200) {
+      log.print(
+        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState} xhr.status=${xhr.status}`
+      );
+
       const json = JSON.parse(xhr.responseText);
 
       dbgJson = json;
@@ -200,175 +425,24 @@ let dbgJson;
           { month: 'short', day: 'numeric', year: 'numeric' }
         );
 
-        document.getElementById(`lastValue-${symbol}-Div`).innerHTML = last;
-        document.getElementById(`volmValue-${symbol}-Div`).innerHTML = volm;
-        document.getElementById(`expValue-${symbol}-Div`).innerHTML = `${exp} (${dte})`;
+        document.getElementById(`lastVal-${symbol}-Div`).innerHTML = last;
+        document.getElementById(`volmVal-${symbol}-Div`).innerHTML = volm;
+        document.getElementById(`expVal-${symbol}-Div`).innerHTML = `${exp} (${dte})`;
 
-        const listRowDiv = document.getElementById(`listRow-${symbol}-Div`);
-        const chainDivId = `chain-${symbol}-Div`;
-
-        let chainDiv = document.getElementById(chainDivId);
-
-        if (chainDiv === null) {
-          chainDiv = document.createElement('div');
-          chainDiv.id = chainDivId;
-          chainDiv.className = 'chain';
-          listRowDiv.appendChild(chainDiv);
-        }
-
-        const strikes = [];
-
-        let fAtmStrike = 0;
-        let atmStrike;
-
-        Object.keys(putChain).forEach((shortStrike) => {
-          let fShortStrike = parseFloat(shortStrike);
-          let iStrike = 0;
-
-          while(iStrike < strikes.length && fShortStrike < parseFloat(strikes[iStrike])) {
-            iStrike++;
-          }
-
-          strikes.splice(iStrike, 0, shortStrike);
-
-          if (Math.abs(fShortStrike - last) < Math.abs(fAtmStrike - last)) {
-            fAtmStrike = fShortStrike;
-            atmStrike = shortStrike;
-          }
-        });
-
-        log.print(`ATM Strike: ${atmStrike}`);
-
-        strikes.forEach((shortStrike, index) => {
-          const fShortStrike = parseFloat(shortStrike);
-          const shortOption = putChain[shortStrike][0];
-          const optionDivId = `option-${symbol}-${shortStrike}-Div`;
-          const appendElts = [];
-          
-          let optionDiv = document.getElementById(optionDivId);
-
-          if (optionDiv === null) {
-            const ioatm = fShortStrike > fAtmStrike
-              ? 'itm'
-              : fShortStrike < fAtmStrike
-                ? 'otm'
-                : 'atm';
-            const oddEven = index % 2 ? 'odd' : 'even';
-            
-            optionDiv = document.createElement('div');
-            optionDiv.id = optionDivId;
-            optionDiv.className = `subPanel option ${ioatm} ${oddEven}`;
-            chainDiv.appendChild(optionDiv);
-          }
-
-          let eltId = `stratValue-${symbol}-${shortStrike}-Div`;
-          let elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'stratValue';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = 'Naked or Covered Put';
-
-          eltId = `strikeValue-${symbol}-${shortStrike}-Div`;
-          elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'strikeValue text';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = fShortStrike;
-
-          eltId = `deltaValue-${symbol}-${shortStrike}-Div`;
-          elt = document.getElementById(eltId);
-
-          if (elt == null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'deltaValue numeric';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = shortOption.delta.toFixed(3);
-
-          eltId = `gammaValue-${symbol}-${shortStrike}-Div`;
-          elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'gammaValue numeric';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = shortOption.gamma.toFixed(3);
-
-          eltId = `thetaValue-${symbol}-${shortStrike}-Div`;
-          elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'thetaValue numeric';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = shortOption.theta.toFixed(3);
-
-          eltId = `vegaValue-${symbol}-${shortStrike}-Div`;
-          elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'vegaValue numeric';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = shortOption.vega.toFixed(3);
-
-          eltId = `markValue-${symbol}-${shortStrike}-Div`;
-          elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Div');
-            elt.id = eltId;
-            elt.className = 'markValue numeric';
-            appendElts.push(elt);
-          }
-
-          elt.innerHTML = shortOption.mark.toFixed(2);
-
-          eltId = `targetValue-${symbol}-${shortStrike}-Input`;
-          elt = document.getElementById(eltId);
-
-          if (elt === null) {
-            elt = document.createElement('Input');
-            elt.id = eltId;
-            elt.className = 'targetValue numeric';
-            appendElts.push(elt);
-          }
-
-          appendElts.forEach((elt) => {
-            optionDiv.appendChild(elt);
-          })
-        });
-        log.print(`handleGetOptionChainResponse: json.status=${json.status}`);
+        loadChain(symbol, putChain, last);
+        loadChain(symbol, callChain, last);
       } else {
         log.print(`handleGetOptionChainResponse: json.status=${json.status}`, log.ERROR);
+        unloadChain(symbol, 'p');
+        unloadChain(symbol, 'c');
       }
     } else if (xhr.readyState == 4 && xhr.status == 401) {
       log.print(
-        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`
+        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`,
+        log.WARNING
       );
       auth.setIsUnauthorized(true);
-    } else {
+    } else if (xhr.readyState == 4) {
       log.print(
         `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`,
         log.ERROR
@@ -405,7 +479,7 @@ let dbgJson;
     localStorage.setItem('calc-fromDate', fromDateInput.value);
 
     if (intervalId !== null) {
-      calc();
+      getOptionChains();
     }
   }
 
@@ -413,24 +487,19 @@ let dbgJson;
     localStorage.setItem('calc-strikeCount', strikeCountSelect.value);
 
     if (intervalId !== null) {
-      clearChains();
-      calc();
-    } else {
-      isStale = true;
+      getOptionChains();
     }
   }
 
   function handleCalcButtonEvent() {
     if (isPaused) {
-      log.print('handleCalcButtonEvent: calculation paused');
-
       return;
     }
 
     if (intervalId === null) {
       calcButton.className = 'icon stop';
-      calc();
-      intervalId = setInterval(calc, calcInterval);
+      getOptionChains();
+      intervalId = setInterval(getOptionChains, calcInterval);
     } else {
       calcButton.className = 'icon go';
       clearInterval(intervalId);
@@ -438,20 +507,41 @@ let dbgJson;
     }
   }
 
-  function handleTargetValueInputEvent() {
+  function handleUnderlyingTargetValInputEvent() {
     if (event.keyCode !== 13) {
       return;
     }
 
-    const fTargetValue = parseFloat(this.value);
+    const targetVal = this.value;
 
-    if (isNaN(fTargetValue)) {
-      log.print(`handleTargetValueInputEvent: ${this.value} is not a number`, log.WARNING);
+    if (isNaN(targetVal)) {
+      log.print(`handleUnderlyingTargetValInputEvent: ${targetVal} is not a number`, log.WARNING);
 
       return;
     }
 
-    calcChain(this.id.split('-')[1], fTargetValue);
+    const idParts = this.id.split('-');
+
+    calcChain(idParts[1], 'c', targetVal);
+    calcChain(idParts[1], 'p', targetVal);
+  }
+
+  function handleOptionTargetValInputEvent() {
+    if (event.keyCode !== 13) {
+      return;
+    }
+
+    const targetVal = this.value || 0;
+
+    if (isNaN(targetVal)) {
+      log.print(`handleOptionTargetValInputEvent: ${this.value} is not a number`, log.WARNING);
+
+      return;
+    }
+
+    const idParts = this.id.split('-');
+
+    calcUnderlying(idParts[1], idParts[0].substr(0, 1), idParts[2], targetVal);
   }
 
   function handleAuthNotification(isAuthorized) {
@@ -460,8 +550,8 @@ let dbgJson;
     if (isAuthorized) {
       if (isPaused) {
         calcButton.className = 'icon stop';
-        calc();
-        intervalId = setInterval(calc, calcInterval);
+        getOptionChains();
+        intervalId = setInterval(getOptionChains, calcInterval);
         isPaused = false;
       }
 

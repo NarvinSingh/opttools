@@ -2,10 +2,10 @@
 
 const log = (function () {
   const SUCCESS = 0;
-  const DEBUG = 1;
-  const INFO = 2;
-  const WARNING = 3;
-  const ERROR = 6;
+  const INFO = 3;
+  const WARNING = 6;
+  const ERROR = 9;
+  const DEBUG = 12;
 
   let msgs = [];
   let printLevel = 0;

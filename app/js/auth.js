@@ -63,7 +63,6 @@ const auth = (function () {
     xhr.open('POST', uri);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.send(body);
-    log.print(`requestToken body: ${body}`);
   }
 
   function refreshToken() {
@@ -75,7 +74,6 @@ const auth = (function () {
     xhr.open('POST', uri);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.send(body);
-    log.print(`refreshToken body: ${body}`);
   }
 
   function addAuthCallback(callback) {
@@ -94,20 +92,21 @@ const auth = (function () {
 
   function processTokenResponse() {
     if (this.readyState == 4 && this.status == 200) {
+      log.print(`processTokenResponse: readyState=${this.readyState} status=${this.status}`);
+
       let json = JSON.parse(this.responseText);
 
       localStorage.setItem('auth-accessToken', json.access_token);
       localStorage.setItem('auth-refreshToken', json.refresh_token);
       isUnauthorized = false;
       authCallbacks.forEach((callback) => callback.call(this, true));
-      log.print(`processTokenResponse: ${this.responseText}`);
-    } else {
-      isUnauthorized = true;
-      authCallbacks.forEach((callback) => callback.call(this, false));
+    } else if (this.readyState == 4) {
       log.print(
         `processTokenResponse: readyState=${this.readyState} status=${this.status}`,
         log.WARNING
       );
+      isUnauthorized = true;
+      authCallbacks.forEach((callback) => callback.call(this, false));
     }
   }
 

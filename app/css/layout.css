@@ -162,8 +162,16 @@ button.pause {
   margin-bottom: -.1em;
 }
 
-.underlying > input.targetValue {
+.underlying > input.targetVal {
   justify-self: right;
+}
+
+.chain {
+  border-bottom: 1px solid;
+}
+
+.chain:last-child {
+  border: none;
 }
 
 .option {
@@ -171,11 +179,11 @@ button.pause {
   padding: .05em 0;
 }
 
-.option .stratValue {
+.option .stratVal {
   grid-column: span 2;
 }
 
-.option input.targetValue {
+.option input.targetVal {
   margin-right: .5556em;
   align-self: center;
   justify-self: right;

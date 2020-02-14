@@ -62,6 +62,10 @@ body {
   color: #EEE;
 }
 
+.chain {
+  border-color: #66F;
+}
+
 .option {
   border-color: #CCC;
 }
