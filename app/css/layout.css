@@ -14,8 +14,8 @@ button {
 button.icon {
   border: none;
   padding: 0;
-  width: 1.3333em;
-  height: 1.3333em;
+  width: 1.1667em;
+  height: 1.1667em;
   background-size: contain;
 }
 
@@ -95,7 +95,7 @@ button.pause {
 }
 
 .panel > .titleControl > .last {
-  margin-right: -.5em;
+  margin-right: -1em;
 }
 
 .panel > .titleControl > input {
@@ -117,6 +117,11 @@ button.pause {
   font-size: .9em;
   height: 1.482em;
   border: 1px solid;
+}
+
+.panel > .titleControl > label,
+.panel > .titleControl > button {
+  align-self: center;
 }
 
 .subPanel {
@@ -160,6 +165,7 @@ button.pause {
 .underlying > button.icon {
   margin-top: -.1em;
   margin-bottom: -.1em;
+  align-self: center;
 }
 
 .underlying > input.targetVal {

@@ -470,6 +470,8 @@ let dbgJson;
   }
 
   function handleAddSymbolButtonEvent() {
+    this.blur();
+
     const symbol = addSymbolInput.value;
 
     watchlist.addSymbol(symbol);
@@ -505,16 +507,18 @@ let dbgJson;
   }
 
   function handleCalcButtonEvent() {
+    this.blur();
+
     if (isPaused) {
       return;
     }
 
     if (intervalId === null) {
-      calcButton.className = 'icon stop';
+      calcButton.className = 'icon last stop';
       getOptionChains();
       intervalId = setInterval(getOptionChains, calcInterval);
     } else {
-      calcButton.className = 'icon go';
+      calcButton.className = 'icon last go';
       clearInterval(intervalId);
       intervalId = null;
     }
@@ -571,7 +575,7 @@ let dbgJson;
       isRefreshing = false;
     } else {
       if (intervalId !== null) {
-        calcButton.className = 'icon pause';
+        calcButton.className = 'icon last pause';
         clearInterval(intervalId);
         intervalId = null;
         isPaused = true;
