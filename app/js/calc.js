@@ -3,7 +3,7 @@
 let dbgJson;
 
 (function () {
-  const calcInterval = 30000;
+  const calcInterval = 3000;
   const defaultStrikeCount = 13;
 
   let addSymbolInput;
@@ -217,10 +217,10 @@ let dbgJson;
       if (elt == null) {
         elt = document.createElement('Div');
         elt.id = eltId;
-        elt.className = 'deltaVal numeric';
         appendElts.push(elt);
       }
 
+      elt.className = `deltaVal numeric${getUpDownClass(elt.innerHTML, option.delta)}`;
       elt.innerHTML = option.delta.toFixed(3);
 
       eltId = `${type}GammaVal-${symbol}-${strike}-Div`;
@@ -229,10 +229,10 @@ let dbgJson;
       if (elt === null) {
         elt = document.createElement('Div');
         elt.id = eltId;
-        elt.className = 'gammaVal numeric';
         appendElts.push(elt);
       }
 
+      elt.className = `gammaVal numeric${getUpDownClass(elt.innerHTML, option.gamma)}`;
       elt.innerHTML = option.gamma.toFixed(3);
 
       eltId = `${type}ThetaVal-${symbol}-${strike}-Div`;
@@ -241,10 +241,10 @@ let dbgJson;
       if (elt === null) {
         elt = document.createElement('Div');
         elt.id = eltId;
-        elt.className = 'thetaVal numeric';
         appendElts.push(elt);
       }
 
+      elt.className = `thetaVal numeric${getUpDownClass(elt.innerHTML, option.theta)}`;
       elt.innerHTML = option.theta.toFixed(3);
 
       eltId = `${type}VegaVal-${symbol}-${strike}-Div`;
@@ -253,10 +253,10 @@ let dbgJson;
       if (elt === null) {
         elt = document.createElement('Div');
         elt.id = eltId;
-        elt.className = 'vegaVal numeric';
         appendElts.push(elt);
       }
 
+      elt.className = `vegaVal numeric${getUpDownClass(elt.innerHTML, option.vega)}`;
       elt.innerHTML = option.vega.toFixed(3);
 
       eltId = `${type}MarkVal-${symbol}-${strike}-Div`;
@@ -265,10 +265,10 @@ let dbgJson;
       if (elt === null) {
         elt = document.createElement('Div');
         elt.id = eltId;
-        elt.className = 'markVal numeric';
         appendElts.push(elt);
       }
 
+      elt.className = `markVal numeric${getUpDownClass(elt.innerHTML, option.mark)}`;
       elt.innerHTML = option.mark.toFixed(2);
 
       eltId = `${type}TargetVal-${symbol}-${strike}-Input`;
@@ -300,9 +300,13 @@ let dbgJson;
     strikes.forEach((strike, index) => {
       const optionDivId = `${type}Option-${symbol}-${strike}-Div`;
       const ioatm = strike > atmStrike
-        ? 'itm'
+        ? type === 'c'
+          ? 'itm'
+          : 'otm'
         : strike < atmStrike
-          ? 'otm'
+          ? type === 'c'
+            ? 'otm'
+            : 'itm'
           : 'atm';
       const oddEven = index % 2 ? 'odd' : 'even';
 
@@ -339,7 +343,6 @@ let dbgJson;
   }
 
   function calcChain(symbol, type, s2) {
-    log.print(`calcChain: chainDiv.id=${type}Chain-${symbol}-Div s2=${s2}`, log.DEBUG);
     const chainDiv = document.getElementById(`${type}Chain-${symbol}-Div`);
     const divs = Array.from(chainDiv.getElementsByClassName('option'));
     const s1 = parseFloat(document.getElementById(`lastVal-${symbol}-Div`).innerHTML);
@@ -396,6 +399,14 @@ let dbgJson;
     });
   }
 
+  function getUpDownClass(prevVal, newVal) {
+    return prevVal > newVal
+      ? ' up'
+      : prevVal < newVal
+        ? ' down'
+        : '';
+  }
+
   function handleGetOptionChainResponse(xhr, symbol, fromDate, strikeCount) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       log.print(
@@ -424,8 +435,10 @@ let dbgJson;
           'en-US',
           { month: 'short', day: 'numeric', year: 'numeric' }
         );
+        const lastDiv = document.getElementById(`lastVal-${symbol}-Div`);
 
-        document.getElementById(`lastVal-${symbol}-Div`).innerHTML = last;
+        lastDiv.className = `lastVal${getUpDownClass(lastDiv.innerHTML, last)}`;
+        lastDiv.innerHTML = last;
         document.getElementById(`volmVal-${symbol}-Div`).innerHTML = volm;
         document.getElementById(`expVal-${symbol}-Div`).innerHTML = `${exp} (${dte})`;
 
