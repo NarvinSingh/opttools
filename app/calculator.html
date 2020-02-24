@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Calculator</title>
+    <link rel='stylesheet' type='text/css' href='css/layout.css'>
+    <link rel='stylesheet' type='text/css' href='css/auth-layout.css'>
+    <link rel='stylesheet' type='text/css' href='css/calculator-layout.css'>
+    <link rel='stylesheet' type='text/css' href='css/color-scheme.css'>
+    <!-- <link rel='stylesheet' type='text/css' href='css/monokai-color-scheme.css'> -->
+    <script src='js/log.js'></script>
+    <script src='js/auth.js'></script>
+    <script src='js/auth-ui.js'></script>
+    <script src='js/watchlist.js'></script>
+    <script src='js/watchlist-ui.js'></script>
+    <script src='js/calculator.js'></script>
+  </head>
+  <body>
+    <h1 id='titleHeading'>Calculator</h1>
+
+    <section id='authorizationSection' class='panel'>
+      <h1 id='authorizationHeading'>Authorization</h1>
+      <label id='clientIDLabel' for='clientIDInput'>Client ID</label>
+      <input id='clientIDInput' type='text' />
+      <label id='redirectURILabel' for='redirectURIInput'>Redirect URI</label>
+      <input id='redirectURIInput' type='text' />
+      <label id='authCodeLabel' for='authCodeInput'>Auth Code</label>
+      <input id='authCodeInput' type='text' />
+      <button id='getAuthCodeButton'>Get Auth Code</button>
+      <button id='requestTokenButton'>Request Token</button>
+      <button id='refreshTokenButton'>Refresh Token</button>
+    </section>
+
+    <section id='listSection' class='panel'>
+      <h1 id='listHeading'>Watchlist</h1>
+      <div id='controlDiv' class='titleControl'>
+        <input id='addSymbolInput' type='text' class='symbol' />
+        <button id='addSymbolButton' class='icon add break' ></button>
+        <label id='fromDateLabel' for='fromDateInput'>Start</label>
+        <input id='fromDateInput' type='date' class='date break' />
+        <label id='strikeCountLabel' for='strikeCountSelect'>Strikes</label>
+        <select id='strikeCountSelect' class='break'>
+          <option value='ALL'>All</option>
+          <option value='3'>1 ATM 1</option>
+          <option value='5'>2 ATM 2</option>
+          <option value='7'>3 ATM 3</option>
+          <option value='9'>4 ATM 4</option>
+          <option value='11'>5 ATM 5</option>
+          <option value='13'>6 ATM 6</option>
+          <option value='15'>7 ATM 7</option>
+          <option value='17'>8 ATM 8</option>
+          <option value='19'>9 ATM 9</option>
+          <option value='21'>10 ATM 10</option>
+          <option value='31'>15 ATM 15</option>
+          <option value='51'>25 ATM 25</option>
+        </select>
+        <button id='goButton' class='icon go last'></button>
+      </div>
+
+      <div id='listHeaderDiv' class='subPanel'>
+        <label id='callsLabel'>Calls</label>
+        <label id='putsLabel'>Puts</label>
+        <label id='strikeLabel' class='text'>Strike</label>
+        <label id='cDeltaLabel' class='numeric'>Delta</label>
+        <label id='cGammaLabel' class='numeric'>Gamma</label>
+        <label id='cThetaLabel' class='numeric'>Theta</label>
+        <label id='cVegaLabel' class='numeric'>Vega</label>
+        <label id='cMarkLabel' class='numeric'>Mark</label>
+        <label id='cTargetLabel' class='numeric'>Target</label>
+        <label id='pDeltaLabel' class='numeric'>Delta</label>
+        <label id='pGammaLabel' class='numeric'>Gamma</label>
+        <label id='pThetaLabel' class='numeric'>Theta</label>
+        <label id='pVegaLabel' class='numeric'>Vega</label>
+        <label id='pMarkLabel' class='numeric'>Mark</label>
+        <label id='pTargetLabel' class='numeric'>Target</label>
+      </div>
+    </section>
+  </body>
+</html>

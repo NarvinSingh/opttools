@@ -8,7 +8,7 @@
   padding-top: .1em;
   padding-bottom: .1em;
   grid-template:
-    "symbolValue lastValue lastValue last sdValue sdValue sd sd . volmValue volmValue volm . exp exp expValue expValue expValue . ."
+    'symbolValue lastValue lastValue last sdValue sdValue sd sd . volmValue volmValue volm . exp exp expValue expValue expValue . .'
     / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 

@@ -1,0 +1,180 @@
+#controlDiv {
+  grid-template-columns: repeat(9, auto);
+}
+
+#listHeaderDiv {
+  grid-template:
+    'callsLabel callsLabel callsLabel callsLabel callsLabel callsLabel . putsLabel putsLabel putsLabel putsLabel putsLabel putsLabel'
+    'cDeltaLabel cGammaLabel cThetaLabel cVegaLabel cMarkLabel cTargetLabel strikeLabel pTargetLabel pMarkLabel pDeltaLabel pGammaLabel pThetaLabel pVegaLabel'
+    / 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+#listHeaderDiv > #callsLabel {
+  grid-area: callsLabel;
+  border: none;
+  justify-self: center;
+}
+
+#listHeaderDiv > #putsLabel {
+  grid-area: putsLabel;
+  border: none;
+  justify-self: center;
+}
+
+#listHeaderDiv > #strikeLabel {
+  grid-area: strikeLabel;
+}
+
+#listHeaderDiv > #cDeltaLabel {
+  grid-area: cDeltaLabel;
+}
+
+#listHeaderDiv > #cGammaLabel {
+  grid-area: cGammaLabel;
+}
+
+#listHeaderDiv > #cThetaLabel {
+  grid-area: cThetaLabel;
+}
+
+#listHeaderDiv > #cVegaLabel {
+  grid-area: cVegaLabel;
+}
+
+#listHeaderDiv > #cMarkLabel {
+  grid-area: cMarkLabel;
+}
+
+#listHeaderDiv > #cTargetLabel {
+  grid-area: cTargetLabel;
+}
+
+#listHeaderDiv > #pDeltaLabel {
+  grid-area: pDeltaLabel;
+}
+
+#listHeaderDiv > #pGammaLabel {
+  grid-area: pGammaLabel;
+}
+
+#listHeaderDiv > #pThetaLabel {
+  grid-area: pThetaLabel;
+}
+
+#listHeaderDiv > #pVegaLabel {
+  grid-area: pVegaLabel;
+}
+
+#listHeaderDiv > #pMarkLabel {
+  grid-area: pMarkLabel;
+}
+
+#listHeaderDiv > #pTargetLabel {
+  grid-area: pTargetLabel;
+}
+
+.underlying {
+  grid-column: span 3;
+  grid-template:
+    'deleteButton symbolVal lastVal last targetVal target volmVal volm exp expVal'
+    / 1fr 4fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr 5fr;
+}
+
+.underlying > button.delete {
+  margin-left: .5em;
+}
+
+.underlying > .symbolVal {
+  grid-area: symbolVal;
+}
+
+.underlying > .last {
+  grid-area: last;
+}
+
+.underlying > .lastVal {
+  grid-area: lastVal;
+  text-align: right;
+}
+
+.underlying > .target {
+  grid-area: target;
+}
+
+.underlying > div.targetVal {
+  grid-area: targetVal;
+  padding: 0;
+  text-align: right;
+}
+
+.underlying input {
+  padding: 0 .5em;
+  width: 5em;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}
+
+.underlying > .volm {
+  grid-area: volm;
+}
+
+.underlying > .volmVal {
+  grid-area: volmVal;
+  text-align: right;
+}
+
+.underlying > .exp {
+  grid-area: exp;
+  text-align: right;
+}
+
+.underlying > .expVal {
+  grid-area: expVal;
+}
+
+.subPanel.c {
+  margin-right: 0;
+  grid-template:
+    'deltaVal gammaVal thetaVal vegaVal markVal targetVal'
+    / 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.subPanel.p {
+  margin-left: 0;
+  grid-template:
+    'targetVal markVal deltaVal gammaVal thetaVal vegaVal'
+    / 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.subPanel > .deltaVal {
+  grid-area: deltaVal;
+}
+.subPanel > .gammaVal {
+  grid-area: gammaVal;
+}
+.subPanel > .thetaVal {
+  grid-area: thetaVal;
+}
+.subPanel > .vegaVal {
+  grid-area: vegaVal;
+}
+.subPanel > .markVal {
+  grid-area: markVal;
+}
+.subPanel > .targetVal {
+  grid-area: targetVal;
+}
+
+.option {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.option input {
+  padding: 0 .5em;
+  width: 5em;
+  height: 1em;
+  font-size: .9em;
+  font-weight: bold;
+  text-align: right;
+}

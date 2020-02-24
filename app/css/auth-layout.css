@@ -1,10 +1,10 @@
 #authorizationSection {
   grid-template:
-    "authorizationHeading authorizationHeading authorizationHeading authorizationHeading"
-    "clientIDLabel clientIDInput clientIDInput clientIDInput"
-    "redirectURILabel redirectURIInput redirectURIInput redirectURIInput"
-    "authCodeLabel authCodeInput authCodeInput authCodeInput"
-    ". getAuthCodeButton requestTokenButton refreshTokenButton"
+    'authorizationHeading authorizationHeading authorizationHeading authorizationHeading'
+    'clientIDLabel clientIDInput clientIDInput clientIDInput'
+    'redirectURILabel redirectURIInput redirectURIInput redirectURIInput'
+    'authCodeLabel authCodeInput authCodeInput authCodeInput'
+    '. getAuthCodeButton requestTokenButton refreshTokenButton'
     / max-content auto auto auto;
 }
 

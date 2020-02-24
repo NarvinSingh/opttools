@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Test: JavaScript</title>
+    <script>
+      const mod = (function() {
+        const customEvent = new Event('customEvent');
+
+        let testInput;
+        let testButton;
+        let testInput2;
+        let testButton2;
+        let testButtonClickCallbackBefore;
+        let testButtonClickCallbackAfter;
+
+        function initEvent() {
+          testInput = document.getElementById('testInput');
+          testButton = document.getElementById('testButton');
+          testInput2 = document.getElementById('testInput2');
+          testButton2 = document.getElementById('testButton2');
+
+          testButton.addEventListener('click', handleTestButtonClick);
+          testButton2.addEventListener('click', handleTestButton2Click);
+          testInput2.addEventListener('customEvent', handleTestInput2CustomEvent);
+        }
+
+        function handleTestButtonClick() {
+          testButtonClickCallbackBefore && testButtonClickCallbackBefore.call(this);
+          testInput.value = '';
+          console.log('handleTestButtonClick: testInput.value cleared');
+          testButtonClickCallbackAfter && testButtonClickCallbackAfter.call(this);
+        }
+
+        function handleTestButton2Click() {
+          testInput2.dispatchEvent(customEvent);
+        }
+
+        function handleTestInput2CustomEvent() {
+          this.value = 'custom Event';
+        }
+
+        window.addEventListener('load', initEvent);
+
+        return {
+          setCallbackBefore: (callback) => { testButtonClickCallbackBefore = callback},
+          setCallbackAfter: (callback) => { testButtonClickCallbackAfter = callback}
+        }
+      }());
+
+      function callback() {
+        console.log(`callback: testInput.value=${testInput.value}`);
+      }
+    </script>
+  </head>
+  <body>
+    <h1 id='titleHeading' class='redacted'>Test: Event Listeners</h1>
+    <input id='testInput' type='text' />
+    <Button id="testButton">Check the console</Button>
+    <input id='testInput2' type='text' />
+    <Button id="testButton2">Fire Custom Event</Button>
+  </body>
+</html>

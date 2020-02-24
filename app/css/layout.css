@@ -20,23 +20,23 @@ button.icon {
 }
 
 button.add {
-  background-image: url(../img/add-1.svg);
+  background-image: url(../img/roundicons-add.svg);
 }
 
 button.delete {
-  background-image: url(../img/delete-1.svg);
+  background-image: url(../img/roundicons-trash-hollow.svg);
 }
 
 button.go {
-  background-image: url(../img/play-1.svg);
+  background-image: url(../img/roundicons-play.svg);
 }
 
 button.stop {
-  background-image: url(../img/stop-1.svg);
+  background-image: url(../img/roundicons-stop.svg);
 }
 
 button.pause {
-  background-image: url(../img/pause-1.svg);
+  background-image: url(../img/roundicons-pause.svg);
 }
 
 #titleHeading {
@@ -143,18 +143,16 @@ button.pause {
 }
 
 #listHeaderDiv > label {
-  border-left: 1px solid;
+  border-top: 1px solid;
   padding-top: .2em;
   padding-bottom: .2em;
 }
 
-#listHeaderDiv > label:first-child {
-  grid-column: span 2;
-  border: none;
-}
-
 .listRow {
+  display: grid;
   grid-column: span 2;
+  grid-template-columns: 6fr 1fr 6fr;
+  grid-auto-flow: dense;
 }
 
 .underlying {
@@ -172,12 +170,17 @@ button.pause {
   justify-self: right;
 }
 
-.chain {
-  border-bottom: 1px solid;
+.listRow > .strike {
+  grid-column: 2;
+  text-align: center;
 }
 
-.chain:last-child {
-  border: none;
+.listRow > .chain.c {
+  grid-column: 1;
+}
+
+.listRow > .chain.p {
+  grid-column: 3;
 }
 
 .option {
@@ -190,9 +193,8 @@ button.pause {
 }
 
 .option input.targetVal {
-  margin-right: .5556em;
   align-self: center;
-  justify-self: right;
+  justify-self: center;
 }
 
 .text {

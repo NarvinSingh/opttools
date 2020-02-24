@@ -98,6 +98,10 @@ body {
   color: #B00;
 }
 
+.strike > .option {
+  background-color: #CCE;
+}
+
 .option.itm.odd,
 .option.itm.odd input {
   background-color: #ECC;
