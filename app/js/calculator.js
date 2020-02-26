@@ -36,7 +36,7 @@ let dbgJson;
     let listRowDiv = document.getElementById(listRowDivId);
 
     if (listRowDiv !== null) {
-      log.print(`loadSymbol: ${symbol} already loaded`, log.WARNING);
+      l.warn(`loadSymbol: ${symbol} already loaded`);
 
       return;
     }
@@ -117,7 +117,7 @@ let dbgJson;
     const symbolDiv = document.getElementById(`listRow-${symbol}-Div`);
 
     if (symbolDiv === null) {
-      log.print(`unloadSymbol: ${symbol} not loaded`, log.WARNING);
+      l.warn(`unloadSymbol: ${symbol} not loaded`);
       
       return;
     }
@@ -410,7 +410,7 @@ let dbgJson;
 
   function handleGetOptionChainResponse(xhr, symbol, fromDate, strikeCount) {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      log.print(
+      l.inform(
         `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState} xhr.status=${xhr.status}`
       );
 
@@ -446,20 +446,18 @@ let dbgJson;
         loadChain(symbol, callChain, last);
         loadChain(symbol, putChain, last);
       } else {
-        log.print(`handleGetOptionChainResponse: json.status=${json.status}`, log.ERROR);
+        l.raise(`handleGetOptionChainResponse: json.status=${json.status}`);
         unloadChain(symbol, 'p');
         unloadChain(symbol, 'c');
       }
     } else if (xhr.readyState == 4 && xhr.status == 401) {
-      log.print(
-        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`,
-        log.WARNING
+      l.warn(
+        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`
       );
       auth.setIsUnauthorized(true);
     } else if (xhr.readyState == 4) {
-      log.print(
-        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`,
-        log.ERROR
+      l.raise(
+        `handleGetOptionChainResponse: xhr.readyState=${xhr.readyState}  xhr.status=${xhr.status}`
       );
     }
   }
@@ -513,7 +511,7 @@ let dbgJson;
     const targetVal = this.value;
 
     if (isNaN(targetVal)) {
-      log.print(`handleUnderlyingTargetValInputEvent: ${targetVal} is not a number`, log.WARNING);
+      l.warn(`handleUnderlyingTargetValInputEvent: ${targetVal} is not a number`);
 
       return;
     }
@@ -532,7 +530,7 @@ let dbgJson;
     const targetVal = this.value || 0;
 
     if (isNaN(targetVal)) {
-      log.print(`handleOptionTargetValInputEvent: ${this.value} is not a number`, log.WARNING);
+      l.warn(`handleOptionTargetValInputEvent: ${this.value} is not a number`);
 
       return;
     }

@@ -1,5 +1,3 @@
-'use strict';
-
 const auth = (function () {
   const defaultClientID = 'NASAPP@AMER.OAUTHAP';
   const defaultRedirectURI = 'http://localhost';
@@ -92,7 +90,7 @@ const auth = (function () {
 
   function processTokenResponse() {
     if (this.readyState == 4 && this.status == 200) {
-      log.print(`processTokenResponse: readyState=${this.readyState} status=${this.status}`);
+      l.inform(`processTokenResponse: readyState=${this.readyState} status=${this.status}`);
 
       let json = JSON.parse(this.responseText);
 
@@ -101,10 +99,7 @@ const auth = (function () {
       isUnauthorized = false;
       authCallbacks.forEach((callback) => callback.call(this, true));
     } else if (this.readyState == 4) {
-      log.print(
-        `processTokenResponse: readyState=${this.readyState} status=${this.status}`,
-        log.WARNING
-      );
+      l.warn(`processTokenResponse: readyState=${this.readyState} status=${this.status}`);
       isUnauthorized = true;
       authCallbacks.forEach((callback) => callback.call(this, false));
     }

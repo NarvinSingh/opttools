@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Test: Class</title>
+    <script>
+      class MyClass {
+        prop = 1;
+
+        doSomething() {
+          console.log(this);
+        }
+
+        static speak() {
+          console.log('MyClass');
+          console.log(`VERBOSE ${MyClass.VERBOSE}`);
+        }
+      }
+
+      MyClass.VERBOSE = 0;
+      MyClass.INFO = 1;
+      MyClass.WARN = 2;
+      MyClass.ERROR = 3;
+
+      function MyFClass() {
+        let prop = 5;
+
+        this.prop2 = prop * 3;
+      }
+    </script>
+  </head>
+  <body>
+    <h1 id='titleHeading' class='redacted'>Test: Class</h1>
+  </body>
+</html>
